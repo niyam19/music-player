@@ -1,0 +1,188 @@
+import React, { useEffect, useRef, useState } from "react";
+import {
+  TbPlayerPlayFilled,
+  TbPlayerPauseFilled,
+  TbPlayerSkipBackFilled,
+  TbPlayerSkipForwardFilled,
+} from "react-icons/tb";
+
+const Player: React.FC<{
+  currentSong: string;
+  onPrev: () => void;
+  onNext: () => void;
+}> = ({ currentSong, onPrev, onNext }) => {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [volume, setVolume] = useState(1.0);
+  const [isMuted, setIsMuted] = useState(false);
+  const [previousVolume, setPreviousVolume] = useState(volume);
+  const [hoverTime, setHoverTime] = useState(0);
+  const [isHovering, setIsHovering] = useState(false);
+  const [mouseX, setMouseX] = useState(0);
+  const [progressBarWidth, setProgressBarWidth] = useState(0);
+
+  const handlePlay = () => {
+    if (audioRef.current) {
+      audioRef.current
+        .play()
+        .then(() => {
+          setIsPlaying(true);
+        })
+        .catch((err) => {
+          console.error("Failed to play audio:", err);
+        });
+    }
+  };
+
+  const handlePause = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    }
+  };
+
+  const togglePlay = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        handlePause();
+      } else {
+        handlePlay();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const formatTime = (timeInSeconds: number): string => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    return `${minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
+  };
+
+  const handleProgress = () => {
+    if (audioRef.current) {
+      setProgress(
+        (audioRef.current.currentTime / audioRef.current.duration) * 100 || 0
+      );
+      if (audioRef.current.currentTime >= audioRef.current.duration) {
+        onNext();
+      }
+    }
+  };
+
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime =
+        (parseFloat(e.target.value) / 100) * audioRef.current.duration;
+    }
+  };
+
+  const toggleMute = () => {
+    if (audioRef.current) {
+      if (!isMuted) {
+        // Save the current volume before muting
+        setPreviousVolume(audioRef.current.volume);
+        audioRef.current.volume = 0.0;
+        setVolume(0.0);
+      } else {
+        // Restore the previous volume
+        audioRef.current.volume = previousVolume;
+        setVolume(previousVolume);
+      }
+      setIsMuted(!isMuted);
+    }
+  };
+
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseFloat(e.target.value);
+    setVolume(newVolume);
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume;
+    }
+  };
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.load();
+      handlePlay();
+      audioRef.current.ontimeupdate = handleProgress;
+    }
+  }, [currentSong]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const newProgressBarWidth = e.currentTarget.offsetWidth;
+    setProgressBarWidth(newProgressBarWidth);
+    
+    const newMouseX = e.nativeEvent.offsetX;
+    const newHoverTime =
+      (newMouseX / progressBarWidth) * (audioRef.current?.duration || 0);
+    setMouseX(newMouseX);
+    setHoverTime(newHoverTime);
+    setIsHovering(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovering(false);
+  };
+
+  return (
+    <>
+      <div
+        className="fixed bottom-[50px] w-full z-10"
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+      >
+        <input
+          type="range"
+          value={progress}
+          onChange={handleSeek}
+          className="w-full min-w-36 h-1 bg-gray-700 rounded-lg appearance-none"
+        />
+        {isHovering && hoverTime > 0 && mouseX > 20 && (
+          <div
+            className="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-black text-white text-xs p-1 rounded"
+            style={{
+              left: `${(mouseX / progressBarWidth) * 100}%`,
+            }}
+          >
+            {formatTime(hoverTime)}
+          </div>
+        )}
+      </div>
+      <div className="fixed bottom-0 left-0 w-full bg-gray-900 text-white p-4 flex items-center justify-between space-x-2">
+        <div className="flex items-center space-x-2"></div>
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center space-x-2">
+          <button onClick={onPrev} className="text-4xl">
+            <TbPlayerSkipBackFilled/>
+          </button>
+          <button onClick={togglePlay} className="text-5xl">
+            {isPlaying ? <TbPlayerPauseFilled/> : <TbPlayerPlayFilled/>}
+          </button>
+          <button onClick={onNext} className="text-4xl">
+          <TbPlayerSkipForwardFilled/>
+          </button>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <span className="text-white text-sm">
+            {formatTime(audioRef.current?.currentTime || 0)} /{" "}
+            {formatTime(audioRef.current?.duration || 0)}
+          </span>
+          <span onClick={toggleMute}>{!isMuted && volume ? "🔊" : "🔈"}</span>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={volume}
+            onChange={handleVolumeChange}
+            className="w-20 h-1 bg-gray-700 rounded-lg appearance-none"
+          />
+        </div>
+        <audio ref={audioRef} src={currentSong} />
+      </div>
+    </>
+  );
+};
+
+export default Player;
