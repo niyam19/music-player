@@ -1,22 +1,38 @@
-import React, { createContext, useRef, useState, useContext } from "react";
+import React, {
+  createContext,
+  useRef,
+  useState,
+  useContext,
+  useEffect,
+} from "react";
+import Song from "../types/Song";
+import { songs } from "../SongData";
 
 type AudioContextType = {
   audioRef: React.RefObject<HTMLAudioElement>;
-  currentSong: string | null;
-  setCurrentSong: (song: string) => void;
+  currentSong: Song | null;
+  setCurrentSong: (song: Song | null) => void;
   isPlaying: boolean;
   togglePlay: () => void;
   playSong: () => void;
   pauseSong: () => void;
-  handleProgress: () => number;
+  handleProgress: () => void;
   progress: number;
+  handlePrev: () => void;
+  handleNext: () => void;
+  handleSongSelect: (song: Song | null) => void;
 };
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
 
-export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const audioRef = useRef<HTMLAudioElement>(null);
-  const [currentSong, setCurrentSong] = useState<string | null>(null);
+  const [currentSongIndex, setCurrentSongIndex] = useState(0);
+  const [currentSong, setCurrentSong] = useState<Song | null>(
+    songs[currentSongIndex]
+  );
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
 
@@ -27,14 +43,46 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  const pauseSong = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      setIsPlaying(false);
+  const handleSongSelect = (song: Song | null) => {
+    const index = songs.findIndex((s: Song) => s?.songId == song?.songId);
+    // console.log(index);
+    if (index !== -1) {
+      setCurrentSongIndex((prev: number) => {
+        if (prev == index) {
+          pauseSong();
+        } else {
+          setCurrentSong(song);
+          setIsPlaying(true);
+        }
+        return index;
+      });
     }
   };
 
-  const togglePlay = () => {
+  const handlePrev = () => {
+    setCurrentSongIndex((prev) => {
+      const newIndex = prev > 0 ? prev - 1 : songs.length - 1;
+      setCurrentSong(songs[newIndex]);
+      return newIndex;
+    });
+  };
+
+  const handleNext = () => {
+    setCurrentSongIndex((prev) => {
+      const newIndex = prev < songs.length - 1 ? prev + 1 : 0;
+      setCurrentSong(songs[newIndex]);
+      return newIndex;
+    });
+  };
+
+  const pauseSong = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setIsPlaying(false); 
+    }
+  };
+
+  const togglePlay = () => { 
     if (isPlaying) {
       pauseSong();
     } else {
@@ -44,12 +92,26 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const handleProgress = () => {
     if (audioRef.current) {
-      const currentProgress =
-        (audioRef.current.currentTime / audioRef.current.duration) * 100 || 0;
-      setProgress(currentProgress);
+      setProgress(
+        (audioRef.current.currentTime / audioRef.current.duration) * 100 || 0
+      );
+      if (audioRef.current.currentTime >= audioRef.current.duration) {
+        handleNext();
+      }
     }
-    return progress;
   };
+
+  useEffect(() => {
+    console.log("isPlaying updated:", isPlaying);
+  }, [isPlaying]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.load();
+      playSong();
+      audioRef.current.ontimeupdate = handleProgress;
+    }
+  }, [currentSong]);
 
   return (
     <AudioContext.Provider
@@ -61,12 +123,15 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         togglePlay,
         playSong,
         pauseSong,
-        handleProgress,
         progress,
+        handleProgress,
+        handleNext,
+        handlePrev,
+        handleSongSelect,
       }}
     >
       {children}
-      <audio ref={audioRef} onTimeUpdate={handleProgress} />
+      <audio ref={audioRef} src={currentSong?.songUrl} />
     </AudioContext.Provider>
   );
 };

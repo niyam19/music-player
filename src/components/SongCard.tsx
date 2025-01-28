@@ -3,14 +3,14 @@ import { IoHeartSharp } from "react-icons/io5";
 import { FaPlay } from "react-icons/fa";
 import { FaPause } from "react-icons/fa6";
 import Song from "../types/Song";
+import { useAudioContext } from "../contexts/AudioContext";
 
 const SongCard: React.FC<{
-  currentSong: Song;
-  currentlyPlayingSongId: number | null;
-  onPlay: (song: Song) => void;
-}> = ({ currentSong, currentlyPlayingSongId, onPlay }) => {
+  selectedSong: Song;
+}> = ({ selectedSong }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const {togglePlay, handleSongSelect, currentSong, isPlaying} = useAudioContext();
 
   const handleMouseEnter = () => {
     setIsHovered(true);
@@ -22,12 +22,16 @@ const SongCard: React.FC<{
     setIsLiked(!isLiked);
   };
 
-  const handlePlay = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onPlay(currentSong);
+  const handlePlay = () => {
+    if(isSelected){
+      togglePlay()
+    } else {  
+      handleSongSelect(selectedSong);
+    }
+    
   };
 
-  const isPlaying = currentlyPlayingSongId === currentSong.songId;
+  const isSelected = selectedSong?.songId === currentSong?.songId;
 
   return (
     <div
@@ -37,8 +41,8 @@ const SongCard: React.FC<{
     >
       <div className="relative">
         <img
-          src={currentSong.songImage}
-          alt={currentSong.songName}
+          src={selectedSong.songImage}
+          alt={selectedSong.songName}
           className={`w-full h-44 object-contain transition duration-200 ${
             isHovered ? "filter brightness-50" : ""
           }`}
@@ -47,13 +51,13 @@ const SongCard: React.FC<{
         <button
           onClick={handlePlay}
           className={`absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full w-12 h-12 mx-auto my-auto hover:bg-opacity-70 text-white transition duration-200 transform hover:scale-125 ${
-            isPlaying ? "" : "hidden"
+            isSelected ? "" : "hidden"
           }`}
         >
-          {isPlaying ? <FaPause size={22} /> : <FaPlay size={20} />}
+          {(isSelected && isPlaying) ? <FaPause size={22} /> : <FaPlay size={20} />}
         </button>
 
-        {isHovered && !isPlaying && (
+        {isHovered && !isSelected && (
           <button
             onClick={handlePlay}
             className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full w-12 h-12 mx-auto my-auto hover:bg-opacity-70 text-white transition duration-200 transform hover:scale-125"
@@ -77,9 +81,9 @@ const SongCard: React.FC<{
       <div className="p-3">
         <h3
           className="text-sm font-semibold text-gray-900 truncate"
-          title={currentSong.songName}
+          title={selectedSong.songName}
         >
-          {currentSong.songName}
+          {selectedSong.songName}
         </h3>
       </div>
     </div>

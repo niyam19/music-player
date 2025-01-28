@@ -4,9 +4,7 @@ import Song from "../types/Song";
 
 const SongList: React.FC<{
   songs: Song[];
-  currentlyPlayingSongId: number | null
-  onSelect: (song: Song) => void;
-}> = ({ songs, currentlyPlayingSongId, onSelect }) => {
+}> = ({ songs}) => {
   
   return (
     <div className="flex flex-wrap justify-center gap-4 p-4">
@@ -16,7 +14,7 @@ const SongList: React.FC<{
           
           className="cursor-pointer"
         >
-          <SongCard currentSong={song} currentlyPlayingSongId={currentlyPlayingSongId} onPlay={onSelect} />
+          <SongCard selectedSong={song}/>
         </div>
       ))}
     </div>

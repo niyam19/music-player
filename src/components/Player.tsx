@@ -1,19 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import {
   TbPlayerPlayFilled,
   TbPlayerPauseFilled,
   TbPlayerSkipBackFilled,
   TbPlayerSkipForwardFilled,
 } from "react-icons/tb";
+import { useAudioContext } from "../contexts/AudioContext";
 
-const Player: React.FC<{
-  currentSong: string;
-  onPrev: () => void;
-  onNext: () => void;
-}> = ({ currentSong, onPrev, onNext }) => {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
+const Player = () => {
+  const {audioRef, isPlaying, togglePlay, progress, handlePrev, handleNext, currentSong} = useAudioContext();
   const [volume, setVolume] = useState(1.0);
   const [isMuted, setIsMuted] = useState(false);
   const [previousVolume, setPreviousVolume] = useState(volume);
@@ -22,52 +17,10 @@ const Player: React.FC<{
   const [mouseX, setMouseX] = useState(0);
   const [progressBarWidth, setProgressBarWidth] = useState(0);
 
-  const handlePlay = () => {
-    if (audioRef.current) {
-      audioRef.current
-        .play()
-        .then(() => {
-          setIsPlaying(true);
-        })
-        .catch((err) => {
-          console.error("Failed to play audio:", err);
-        });
-    }
-  };
-
-  const handlePause = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    }
-  };
-
-  const togglePlay = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        handlePause();
-      } else {
-        handlePlay();
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
-
   const formatTime = (timeInSeconds: number): string => {
     const minutes = Math.floor(timeInSeconds / 60);
     const seconds = Math.floor(timeInSeconds % 60);
     return `${minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
-  };
-
-  const handleProgress = () => {
-    if (audioRef.current) {
-      setProgress(
-        (audioRef.current.currentTime / audioRef.current.duration) * 100 || 0
-      );
-      if (audioRef.current.currentTime >= audioRef.current.duration) {
-        onNext();
-      }
-    }
   };
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,12 +33,10 @@ const Player: React.FC<{
   const toggleMute = () => {
     if (audioRef.current) {
       if (!isMuted) {
-        // Save the current volume before muting
         setPreviousVolume(audioRef.current.volume);
         audioRef.current.volume = 0.0;
         setVolume(0.0);
       } else {
-        // Restore the previous volume
         audioRef.current.volume = previousVolume;
         setVolume(previousVolume);
       }
@@ -100,14 +51,6 @@ const Player: React.FC<{
       audioRef.current.volume = newVolume;
     }
   };
-
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.load();
-      handlePlay();
-      audioRef.current.ontimeupdate = handleProgress;
-    }
-  }, [currentSong]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const newProgressBarWidth = e.currentTarget.offsetWidth;
@@ -152,13 +95,13 @@ const Player: React.FC<{
       <div className="fixed bottom-0 left-0 w-full bg-gray-900 text-white p-4 flex items-center justify-between space-x-2">
         <div className="flex items-center space-x-2"></div>
         <div className="absolute left-1/2 -translate-x-1/2 flex items-center space-x-2">
-          <button onClick={onPrev} className="text-4xl">
+          <button onClick={handlePrev} className="text-4xl">
             <TbPlayerSkipBackFilled/>
           </button>
           <button onClick={togglePlay} className="text-5xl">
             {isPlaying ? <TbPlayerPauseFilled/> : <TbPlayerPlayFilled/>}
           </button>
-          <button onClick={onNext} className="text-4xl">
+          <button onClick={handleNext} className="text-4xl">
           <TbPlayerSkipForwardFilled/>
           </button>
         </div>
@@ -179,7 +122,7 @@ const Player: React.FC<{
             className="w-20 h-1 bg-gray-700 rounded-lg appearance-none"
           />
         </div>
-        <audio ref={audioRef} src={currentSong} />
+        <audio ref={audioRef} src={currentSong?.songUrl} />
       </div>
     </>
   );
