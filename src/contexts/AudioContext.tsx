@@ -5,23 +5,9 @@ import React, {
   useContext,
   useEffect,
 } from "react";
-import Song from "../types/Song";
+import Song from "../interfaces/Song";
 import { songs } from "../SongData";
-
-type AudioContextType = {
-  audioRef: React.RefObject<HTMLAudioElement>;
-  currentSong: Song | null;
-  setCurrentSong: (song: Song | null) => void;
-  isPlaying: boolean;
-  togglePlay: () => void;
-  playSong: () => void;
-  pauseSong: () => void;
-  handleProgress: () => void;
-  progress: number;
-  handlePrev: () => void;
-  handleNext: () => void;
-  handleSongSelect: (song: Song | null) => void;
-};
+import AudioContextType from "../interfaces/AudioContextType";
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
 
@@ -30,7 +16,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
-  const [currentSong, setCurrentSong] = useState<Song | null>(
+  const [currentSong, setCurrentSong] = useState<Song>(
     songs[currentSongIndex]
   );
   const [isPlaying, setIsPlaying] = useState(false);
@@ -43,7 +29,28 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const handleSongSelect = (song: Song | null) => {
+  const [songDurations, setSongDurations] = useState<{ [key: string]: number }>({});
+
+  const fetchDurations = () => {
+    const durations: { [key: string]: number } = {};
+  
+    songs.forEach((song) => {
+      const audio = new Audio(song.songUrl);
+      audio.onloadedmetadata = () => {
+        durations[song.songId] = audio.duration;
+        if (Object.keys(durations).length === songs.length) {
+          setSongDurations(durations);
+        }
+      };
+    });
+  };
+
+  useEffect(() => {
+    fetchDurations();
+    console.log(songDurations); 
+  }, []);
+
+  const handleSongSelect = (song: Song) => {
     const index = songs.findIndex((s: Song) => s?.songId == song?.songId);
     // console.log(index);
     if (index !== -1) {
@@ -117,6 +124,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
     <AudioContext.Provider
       value={{
         audioRef,
+        songs,
         currentSong,
         setCurrentSong,
         isPlaying,
@@ -128,6 +136,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
         handleNext,
         handlePrev,
         handleSongSelect,
+        songDurations
       }}
     >
       {children}

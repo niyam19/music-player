@@ -2,15 +2,18 @@ import React, { useState } from "react";
 import { IoHeartSharp } from "react-icons/io5";
 import { FaPlay } from "react-icons/fa";
 import { FaPause } from "react-icons/fa6";
-import Song from "../types/Song";
+import Song from "../interfaces/Song";
 import { useAudioContext } from "../contexts/AudioContext";
+import { useLikedSongs } from "../contexts/LikedSongsContext";
 
 const SongCard: React.FC<{
   selectedSong: Song;
 }> = ({ selectedSong }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
+  // const [isLiked, setIsLiked] = useState(false);
   const {togglePlay, handleSongSelect, currentSong, isPlaying} = useAudioContext();
+  const {toggleLike, likedSongs} = useLikedSongs();
+  const isLiked = likedSongs.some((song) => song.songId === selectedSong.songId);
 
   const handleMouseEnter = () => {
     setIsHovered(true);
@@ -18,17 +21,12 @@ const SongCard: React.FC<{
   const handleMouseLeave = () => {
     setIsHovered(false);
   };
-  const handleHeartClick = () => {
-    setIsLiked(!isLiked);
-  };
-
   const handlePlay = () => {
     if(isSelected){
       togglePlay()
     } else {  
       handleSongSelect(selectedSong);
     }
-    
   };
 
   const isSelected = selectedSong?.songId === currentSong?.songId;
@@ -68,7 +66,7 @@ const SongCard: React.FC<{
 
         {isHovered && (
           <button
-            onClick={handleHeartClick}
+            onClick={() => toggleLike(selectedSong)}
             className={`absolute top-2 left-2 p-1 rounded-full transition duration-200 text-red-500 ${
               isLiked ? "text-red-500" : "text-white"
             }`}

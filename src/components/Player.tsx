@@ -5,10 +5,25 @@ import {
   TbPlayerSkipBackFilled,
   TbPlayerSkipForwardFilled,
 } from "react-icons/tb";
+import { HiSpeakerWave, HiSpeakerXMark } from "react-icons/hi2";
 import { useAudioContext } from "../contexts/AudioContext";
+import { IoHeartSharp } from "react-icons/io5";
+import { useLikedSongs } from "../contexts/LikedSongsContext";
 
 const Player = () => {
-  const {audioRef, isPlaying, togglePlay, progress, handlePrev, handleNext, currentSong} = useAudioContext();
+  const {
+    audioRef,
+    isPlaying,
+    togglePlay,
+    progress,
+    handlePrev,
+    handleNext,
+    currentSong,
+  } = useAudioContext();
+  const { toggleLike, likedSongs } = useLikedSongs();
+  const isLiked = likedSongs.some(
+    (song) => song.songId === currentSong.songId
+  );
   const [volume, setVolume] = useState(1.0);
   const [isMuted, setIsMuted] = useState(false);
   const [previousVolume, setPreviousVolume] = useState(volume);
@@ -55,7 +70,7 @@ const Player = () => {
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const newProgressBarWidth = e.currentTarget.offsetWidth;
     setProgressBarWidth(newProgressBarWidth);
-    
+
     const newMouseX = e.nativeEvent.offsetX;
     const newHoverTime =
       (newMouseX / progressBarWidth) * (audioRef.current?.duration || 0);
@@ -71,7 +86,7 @@ const Player = () => {
   return (
     <>
       <div
-        className="fixed bottom-[50px] w-full z-10"
+        className="fixed bottom-[56px] w-full z-10"
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
       >
@@ -92,26 +107,43 @@ const Player = () => {
           </div>
         )}
       </div>
-      <div className="fixed bottom-0 left-0 w-full bg-gray-900 text-white p-4 flex items-center justify-between space-x-2">
-        <div className="flex items-center space-x-2"></div>
+      <div className="fixed bottom-0 left-0 w-full h-16 bg-gray-900 text-white p-4 flex items-center justify-between space-x-2">
+        <div className="flex items-center space-x-2">
+          <img
+            className="w-10"
+            src={currentSong?.songImage}
+            alt={currentSong?.songName}
+          />
+          <span>{currentSong?.songName}</span>
+          <button
+            onClick={() => toggleLike(currentSong)}
+            className={`rounded-full transition duration-200 text-red-500 ${
+              isLiked ? "text-red-500" : "text-white"
+            }`}
+          >
+            <IoHeartSharp size={20} />
+          </button>
+        </div>
         <div className="absolute left-1/2 -translate-x-1/2 flex items-center space-x-2">
           <button onClick={handlePrev} className="text-4xl">
-            <TbPlayerSkipBackFilled/>
+            <TbPlayerSkipBackFilled />
           </button>
           <button onClick={togglePlay} className="text-5xl">
-            {isPlaying ? <TbPlayerPauseFilled/> : <TbPlayerPlayFilled/>}
+            {isPlaying ? <TbPlayerPauseFilled /> : <TbPlayerPlayFilled />}
           </button>
           <button onClick={handleNext} className="text-4xl">
-          <TbPlayerSkipForwardFilled/>
+            <TbPlayerSkipForwardFilled />
           </button>
         </div>
 
         <div className="flex items-center space-x-2">
-          <span className="text-white text-sm">
+          <span className="text-white text-base mr-2">
             {formatTime(audioRef.current?.currentTime || 0)} /{" "}
             {formatTime(audioRef.current?.duration || 0)}
           </span>
-          <span onClick={toggleMute}>{!isMuted && volume ? "🔊" : "🔈"}</span>
+          <span onClick={toggleMute}>
+            {!isMuted && volume ? <HiSpeakerWave /> : <HiSpeakerXMark />}
+          </span>
           <input
             type="range"
             min="0"

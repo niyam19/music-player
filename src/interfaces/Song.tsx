@@ -1,4 +1,4 @@
-type Song = {
+interface Song {
     songId: number;
     songUrl: string;
     songName: string;

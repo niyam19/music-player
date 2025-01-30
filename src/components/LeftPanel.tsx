@@ -1,5 +1,9 @@
+import { useNavigate } from "react-router-dom";
 
 const LeftPanel = () => {
+
+  const navigate = useNavigate();
+
   return (
     <div className="w-64 bg-gray-900 h-screen text-white p-4 flex-shrink-0">
       <div className="mb-8">
@@ -15,7 +19,7 @@ const LeftPanel = () => {
         <h2 className="text-xl font-semibold mb-4">Library</h2>
         <ul className="space-y-2">
             <li className="hover:text-gray-400 cursor-pointer">History</li>
-            <li className="hover:text-gray-400 cursor-pointer">Liked Songs</li>
+            <li className="hover:text-gray-400 cursor-pointer" onClick={() => navigate("/liked-songs")}>Liked Songs</li>
         </ul>
       </div>
     </div>

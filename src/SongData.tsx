@@ -1,4 +1,4 @@
-import Song from "./types/Song";
+import Song from "./interfaces/Song";
 
 export const songs: Song[] = [
     {
