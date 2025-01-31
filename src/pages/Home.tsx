@@ -5,7 +5,7 @@ const Home = () => {
   const { songs } = useAudioContext();
 
   return (
-    <div className="flex flex-wrap justify-center gap-4 p-4">
+    <div className="h-[80vh] overflow-y-auto flex flex-wrap justify-center gap-4 p-4">
       {songs.map((song, index) => (
         <div key={index} className="cursor-pointer">
           <SongCard selectedSong={song} />

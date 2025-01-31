@@ -15,7 +15,7 @@ const LikedSongs = () => {
   } = useAudioContext();
 
   return (
-    <div className="max-w-4xl mx-auto mt-8">
+    <div className="max-w-full h-[80vh] overflow-y-auto mt-8 pb-5">
       <table className="w-full text-left border-collapse">
         <thead>
           <tr className="text-gray-400 text-sm border-b border-grey-700">

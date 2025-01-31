@@ -9,8 +9,8 @@ import { LikedSongsProvider } from "./contexts/LikedSongsContext";
 
 const App: React.FC = () => {
   return (
-    <AudioProvider>
-      <LikedSongsProvider>
+    <LikedSongsProvider>
+      <AudioProvider>
         <Router>
           <div className="bg-gray-800 h-screen flex flex-col">
             <Header />
@@ -24,8 +24,8 @@ const App: React.FC = () => {
             <Player />
           </div>
         </Router>
-      </LikedSongsProvider>
-    </AudioProvider>
+      </AudioProvider>
+    </LikedSongsProvider>
   );
 };
 
