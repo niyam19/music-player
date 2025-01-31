@@ -13,7 +13,7 @@ interface AudioContextType {
     progress: number;
     handlePrev: () => void;
     handleNext: () => void;
-    handleSongSelect: (song: Song) => void;
+    handleSongSelect: (song: Song, fromLikedSongs: boolean) => void;
     songDurations: Record<number, number>
 };
 

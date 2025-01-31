@@ -8,6 +8,7 @@ import React, {
 import Song from "../interfaces/Song";
 import { songs } from "../SongData";
 import AudioContextType from "../interfaces/AudioContextType";
+import { useLikedSongs } from "./LikedSongsContext";
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
 
@@ -16,11 +17,11 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
-  const [currentSong, setCurrentSong] = useState<Song>(
-    songs[currentSongIndex]
-  );
+  const [currentSong, setCurrentSong] = useState<Song>(songs[currentSongIndex]);
+  const [songList, setSongList] = useState<Song[]>(songs);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+  const { likedSongs } = useLikedSongs();
 
   const playSong = () => {
     if (audioRef.current) {
@@ -29,11 +30,13 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const [songDurations, setSongDurations] = useState<{ [key: string]: number }>({});
+  const [songDurations, setSongDurations] = useState<{ [key: string]: number }>(
+    {}
+  );
 
   const fetchDurations = () => {
     const durations: { [key: string]: number } = {};
-  
+
     songs.forEach((song) => {
       const audio = new Audio(song.songUrl);
       audio.onloadedmetadata = () => {
@@ -47,12 +50,12 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     fetchDurations();
-    console.log(songDurations); 
+    console.log(songDurations);
   }, []);
 
-  const handleSongSelect = (song: Song) => {
-    const index = songs.findIndex((s: Song) => s?.songId == song?.songId);
-    // console.log(index);
+  const handleSongSelect = (song: Song, fromLikedSongs = false) => {
+    fromLikedSongs ? setSongList(likedSongs) : setSongList(songs);
+    const index = songList.findIndex((s: Song) => s?.songId == song?.songId);
     if (index !== -1) {
       setCurrentSongIndex((prev: number) => {
         if (prev == index) {
@@ -68,16 +71,16 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const handlePrev = () => {
     setCurrentSongIndex((prev) => {
-      const newIndex = prev > 0 ? prev - 1 : songs.length - 1;
-      setCurrentSong(songs[newIndex]);
+      const newIndex = prev > 0 ? prev - 1 : songList.length - 1;
+      setCurrentSong(songList[newIndex]);
       return newIndex;
     });
   };
 
   const handleNext = () => {
     setCurrentSongIndex((prev) => {
-      const newIndex = prev < songs.length - 1 ? prev + 1 : 0;
-      setCurrentSong(songs[newIndex]);
+      const newIndex = prev < songList.length - 1 ? prev + 1 : 0;
+      setCurrentSong(songList[newIndex]);
       return newIndex;
     });
   };
@@ -85,11 +88,11 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
   const pauseSong = () => {
     if (audioRef.current) {
       audioRef.current.pause();
-      setIsPlaying(false); 
+      setIsPlaying(false);
     }
   };
 
-  const togglePlay = () => { 
+  const togglePlay = () => {
     if (isPlaying) {
       pauseSong();
     } else {
@@ -136,7 +139,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
         handleNext,
         handlePrev,
         handleSongSelect,
-        songDurations
+        songDurations,
       }}
     >
       {children}

@@ -25,7 +25,7 @@ const SongCard: React.FC<{
     if(isSelected){
       togglePlay()
     } else {  
-      handleSongSelect(selectedSong);
+      handleSongSelect(selectedSong, false);
     }
   };
 

@@ -30,7 +30,7 @@ const LikedSongs = () => {
               if (isSelected) {
                 togglePlay();
               } else {
-                handleSongSelect(song);
+                handleSongSelect(song, true);
               }
             };
             const isSelected = currentSong?.songId === song?.songId;
