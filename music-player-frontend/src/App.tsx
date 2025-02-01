@@ -7,6 +7,9 @@ import { BrowserRouter as Router } from "react-router-dom";
 import { AudioProvider } from "./contexts/AudioContext";
 import { LikedSongsProvider } from "./contexts/LikedSongsContext";
 
+// To do :
+// - when selected song from the liked songs song should play from liked songs list already done need improvements
+
 const App: React.FC = () => {
   return (
     <LikedSongsProvider>
