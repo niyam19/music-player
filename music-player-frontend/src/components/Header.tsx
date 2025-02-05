@@ -21,6 +21,7 @@ const Header = () => {
       </div>
       <div>
         <img
+          onClick={() => navigate("/login")}
           src={Profile}
           alt="Profile Logo"
           className="w-8 h-8 rounded-full"

@@ -1,7 +1,6 @@
 import Home from "../pages/Home";
 import { Route, Routes } from "react-router-dom";
 import LikedSongs from "../pages/LikedSongs";
-
 const AppRoutes = () => {
   return (
     <Routes>
