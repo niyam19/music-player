@@ -1,6 +1,4 @@
-import Song from "./interfaces/Song";
-
-export const songs: Song[] = [
+export const songs = [
     {
       songId: 1,
       songUrl:
@@ -81,4 +79,4 @@ export const songs: Song[] = [
       songImage:
         "https://c.saavncdn.com/408/Rockstar-Hindi-2011-20221212023139-500x500.jpg",
     },
-  ];
+];

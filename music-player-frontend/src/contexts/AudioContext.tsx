@@ -6,7 +6,6 @@ import React, {
   useEffect,
 } from "react";
 import Song from "../interfaces/Song";
-import { songs } from "../SongData";
 import AudioContextType from "../interfaces/AudioContextType";
 import { useLikedSongs } from "./LikedSongsContext";
 
@@ -16,9 +15,10 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const [songs, setSongs] = useState<Song[]>([]);
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
-  const [currentSong, setCurrentSong] = useState<Song>(songs[currentSongIndex]);
-  const [songList, setSongList] = useState<Song[]>(songs);
+  const [currentSong, setCurrentSong] = useState<Song | null>(null);
+  const [songList, setSongList] = useState<Song[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const { likedSongs } = useLikedSongs();
@@ -49,8 +49,23 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   useEffect(() => {
+    const fetchSongs = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/songs");
+        const data = await response.json();
+        setSongs(data);
+        setSongList(data);
+        if (data.length > 0) {
+          setCurrentSong(data[0]);
+        }
+        
+      } catch (error) {
+        console.error("Error fetching songs:", error);
+      }
+    };
+
+    fetchSongs();
     fetchDurations();
-    console.log(songDurations);
   }, []);
 
   const handleSongSelect = (song: Song, fromLikedSongs = false) => {
