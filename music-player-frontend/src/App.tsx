@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Player from "./components/Player";
 import Header from "./components/Header";
 import LeftPanel from "./components/LeftPanel";
-import AppRoutes from "./routes/routes";
+import AppRoutes from "./routes/appRoutes";
 import { BrowserRouter as Router, useNavigate } from "react-router-dom";
 import { AudioProvider } from "./contexts/AudioContext";
 import { LikedSongsProvider } from "./contexts/LikedSongsContext";

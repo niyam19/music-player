@@ -17,7 +17,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
   const audioRef = useRef<HTMLAudioElement>(null);
   const [songs, setSongs] = useState<Song[]>([]);
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
-  const [currentSong, setCurrentSong] = useState<Song | null>(null);
+  const [currentSong, setCurrentSong] = useState<any>(null); //NEED TO CHECK TYPE TEMPRORY ADDED ANY
   const [songList, setSongList] = useState<Song[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -36,12 +36,12 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchDurations = () => {
     const durations: { [key: string]: number } = {};
-
+    
     songs.forEach((song) => {
       const audio = new Audio(song.songUrl);
       audio.onloadedmetadata = () => {
         durations[song.songId] = audio.duration;
-        if (Object.keys(durations).length === songs.length) {
+        if (Object.keys(durations).length === songs.length) {         
           setSongDurations(durations);
         }
       };
@@ -58,15 +58,19 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
         if (data.length > 0) {
           setCurrentSong(data[0]);
         }
-        
       } catch (error) {
         console.error("Error fetching songs:", error);
       }
     };
 
     fetchSongs();
-    fetchDurations();
   }, []);
+  useEffect(() => {
+    if (songs.length > 0) {
+      fetchDurations();
+    }
+  }, [songs]);
+  
 
   const handleSongSelect = (song: Song, fromLikedSongs = false) => {
     fromLikedSongs ? setSongList(likedSongs) : setSongList(songs);

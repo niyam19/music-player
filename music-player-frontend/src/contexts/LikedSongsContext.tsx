@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import LikedSongsContextType from "../interfaces/LikedSongsType";
 import Song from "../interfaces/Song";
+import { API_URL } from "../constants/apiEnum";
 
 const LikedSongsContext = createContext<LikedSongsContextType | undefined>(
   undefined
@@ -17,24 +18,60 @@ export const useLikedSongs = () => {
 export const LikedSongsProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    alert("User not logged in");
+    return;
+  }
+
   const [likedSongs, setLikedSongs] = useState<Song[]>([]);
 
+  useEffect(() => {
+    getLikedSongs();
+    console.log("Liked songs", likedSongs);
+  }, []);
+
   const toggleLike = (song: Song) => {
-    setLikedSongs((prev) => {
-      return prev.some((s) => s.songId === song.songId)
-        ? prev.filter((s) => s.songId !== song.songId)
-        : [...prev, song];
-    });
+    toggleLikedSong(song);
   };
 
-  useEffect(() => {
-    console.log("Liked songs",likedSongs);
-  }, [likedSongs])
+  const getLikedSongs = async () => {
+    const response = await fetch(`${API_URL}/liked-songs`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch liked songs");
+    }
+    const data = await response.json();
+      console.log("Fetched liked songs:", data);
 
+      setLikedSongs(data);
+  };
 
-  return(
+  const toggleLikedSong = async (song: Song) => {
+    const response = await fetch(`${API_URL}/liked-songs`, {
+      method: likedSongs.some((s) => s.songId === song.songId)
+        ? "DELETE"
+        : "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(song),
+    });   
+    if (!response.ok) {
+      throw new Error("Failed to add song to liked songs");
+    }
+    getLikedSongs();
+  };
+
+  return (
     <LikedSongsContext.Provider value={{ likedSongs, toggleLike }}>
-        {children}
+      {children}
     </LikedSongsContext.Provider>
-  )
+  );
 };

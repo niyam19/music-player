@@ -21,8 +21,8 @@ const Player = () => {
     currentSong,
   } = useAudioContext();
   const { toggleLike, likedSongs } = useLikedSongs();
-  const isLiked = likedSongs.some(
-    (song) => song.songId === currentSong.songId
+  const isLiked = likedSongs?.some(
+    (song) => song?.songId === currentSong?.songId
   );
   const [volume, setVolume] = useState(1.0);
   const [isMuted, setIsMuted] = useState(false);

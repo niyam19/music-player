@@ -19,9 +19,10 @@ const Header = () => {
           className="w-full bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 "
         />
       </div>
-      <div>
+      <div className="flex items-center">
+        <span className="mx-2 font-semibold">niyam19</span>
         <img
-          onClick={() => navigate("/login")}
+          onClick={() => navigate("/profile")}
           src={Profile}
           alt="Profile Logo"
           className="w-8 h-8 rounded-full"

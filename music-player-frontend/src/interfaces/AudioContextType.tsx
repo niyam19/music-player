@@ -3,7 +3,7 @@ import Song from "./Song";
 interface AudioContextType {
     songs: Song[];
     audioRef: React.RefObject<HTMLAudioElement>;
-    currentSong: Song | null;
+    currentSong: Song;
     setCurrentSong: (song: Song) => void;
     isPlaying: boolean;
     togglePlay: () => void;

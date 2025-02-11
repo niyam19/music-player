@@ -18,7 +18,7 @@ const LeftPanel = () => {
       <div>
         <h2 className="text-xl font-semibold mb-4">Library</h2>
         <ul className="space-y-2">
-            <li className="hover:text-gray-400 cursor-pointer">History</li>
+            {/* <li className="hover:text-gray-400 cursor-pointer">History</li> */}
             <li className="hover:text-gray-400 cursor-pointer" onClick={() => navigate("/liked-songs")}>Liked Songs</li>
         </ul>
       </div>

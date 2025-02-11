@@ -4,6 +4,7 @@ import cors from "cors";
 import connectDB from "./config/db";
 import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
+import likedSongsRoutes from "./routes/likedSongsRoutes"
 import { songs } from "./SongData";
 
 dotenv.config();
@@ -15,6 +16,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/liked-songs", likedSongsRoutes)
 
 app.get("/api/songs", (req, res) => {
     res.json(songs);
