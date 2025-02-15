@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../constants/apiEnum";
 
 const SignUp = () => {
   const [email, setEmail] = useState("");
@@ -21,7 +22,7 @@ const SignUp = () => {
     const data = { email, username, password };
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/signUp", {
+      const response = await fetch(`${API_URL}/auth/signUp`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

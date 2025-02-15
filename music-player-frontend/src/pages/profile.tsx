@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ProfilePlaceholder from "../assets/icons/profile-icon.png";
+import { API_URL } from "../constants/apiEnum";
 
 const ProfilePage = () => {
   const storedUserData = localStorage.getItem("userData");
@@ -18,7 +19,7 @@ const ProfilePage = () => {
     const updatedUserData = { ...user, username};
     try{
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/user/update-profile', {
+      const response = await fetch(`${API_URL}/user/update-profile`, {
         method: 'PUT',
         headers: {
           "Content-Type": "application/json",

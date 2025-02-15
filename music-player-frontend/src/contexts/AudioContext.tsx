@@ -8,6 +8,7 @@ import React, {
 import Song from "../interfaces/Song";
 import AudioContextType from "../interfaces/AudioContextType";
 import { useLikedSongs } from "./LikedSongsContext";
+import { API_URL } from "../constants/apiEnum";
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
 
@@ -51,7 +52,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const fetchSongs = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/songs");
+        const response = await fetch(`${API_URL}/songs`);
         const data = await response.json();
         setSongs(data);
         setSongList(data);

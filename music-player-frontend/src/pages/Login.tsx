@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { API_URL } from '../constants/apiEnum';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -14,7 +15,7 @@ const Login = () => {
     const data = { email, password };
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
