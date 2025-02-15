@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   TbPlayerPlayFilled,
   TbPlayerPauseFilled,
@@ -46,6 +46,14 @@ const Player = () => {
     }
   };
 
+  useEffect(() => {
+    if (volume == 0) {
+      setIsMuted(true);
+    } else {
+      setIsMuted(false);
+    }
+  }, [volume]);
+
   const toggleMute = () => {
     if (audioRef.current) {
       if (!isMuted) {
@@ -88,8 +96,6 @@ const Player = () => {
     <>
       <div
         className="fixed bottom-[56px] w-full z-10"
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
       >
         <input
           type="range"
@@ -97,17 +103,23 @@ const Player = () => {
           onChange={handleSeek}
           className="w-full min-w-36 h-1 rounded-lg appearance-none"
           style={{
-              background: `linear-gradient(to right, ${isProgressHovering ? "#60a5fa" : "white"} 0%, ${isProgressHovering ? "#60a5fa" : "white"} ${
-                progress
-              }%, #3f3f46 ${progress}%, #3f3f46 100%)`,
-            }}
+            background: `linear-gradient(to right, ${
+              isProgressHovering ? "#60a5fa" : "white"
+            } 0%, ${
+              isProgressHovering ? "#60a5fa" : "white"
+            } ${progress}%, #3f3f46 ${progress}%, #3f3f46 100%)`,
+          }}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
         />
 
-        {isProgressHovering && hoverTime > 0 && mouseX > 20 && (
+        {isProgressHovering && hoverTime > 0 && (
           <div
-            className="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-black text-white text-xs p-1 rounded"
+            className="absolute top-[-20px] bg-black text-white text-xs p-1 rounded"
             style={{
-              left: `${(mouseX / progressBarWidth) * 100}%`,
+              left: `${Math.min(Math.max((mouseX / progressBarWidth) * 100, 5), 95)}%`,
+              transform: "translateX(-50%)",
+              whiteSpace: "nowrap",
             }}
           >
             {formatTime(hoverTime)}
@@ -160,7 +172,9 @@ const Player = () => {
             onChange={handleVolumeChange}
             className="w-20 h-1 appearance-none rounded-lg"
             style={{
-              background: `linear-gradient(to right, ${isVolumeHovering ? "#60a5fa" : "white"} 0%, ${isVolumeHovering ? "#60a5fa" : "white"} ${
+              background: `linear-gradient(to right, ${
+                isVolumeHovering ? "#60a5fa" : "white"
+              } 0%, ${isVolumeHovering ? "#60a5fa" : "white"} ${
                 volume * 100
               }%, #3f3f46 ${volume * 100}%, #3f3f46 100%)`,
             }}
