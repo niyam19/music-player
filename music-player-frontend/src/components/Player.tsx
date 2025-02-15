@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   TbPlayerPlayFilled,
   TbPlayerPauseFilled,
@@ -28,7 +28,8 @@ const Player = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [previousVolume, setPreviousVolume] = useState(volume);
   const [hoverTime, setHoverTime] = useState(0);
-  const [isHovering, setIsHovering] = useState(false);
+  const [isProgressHovering, setIsProgressHovering] = useState(false);
+  const [isVolumeHovering, setIsVolumeHovering] = useState(false);
   const [mouseX, setMouseX] = useState(0);
   const [progressBarWidth, setProgressBarWidth] = useState(0);
 
@@ -76,11 +77,11 @@ const Player = () => {
       (newMouseX / progressBarWidth) * (audioRef.current?.duration || 0);
     setMouseX(newMouseX);
     setHoverTime(newHoverTime);
-    setIsHovering(true);
+    setIsProgressHovering(true);
   };
 
   const handleMouseLeave = () => {
-    setIsHovering(false);
+    setIsProgressHovering(false);
   };
 
   return (
@@ -94,9 +95,15 @@ const Player = () => {
           type="range"
           value={progress}
           onChange={handleSeek}
-          className="w-full min-w-36 h-1 bg-gray-700 rounded-lg appearance-none"
+          className="w-full min-w-36 h-1 rounded-lg appearance-none"
+          style={{
+              background: `linear-gradient(to right, ${isProgressHovering ? "#60a5fa" : "white"} 0%, ${isProgressHovering ? "#60a5fa" : "white"} ${
+                progress
+              }%, #3f3f46 ${progress}%, #3f3f46 100%)`,
+            }}
         />
-        {isHovering && hoverTime > 0 && mouseX > 20 && (
+
+        {isProgressHovering && hoverTime > 0 && mouseX > 20 && (
           <div
             className="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-black text-white text-xs p-1 rounded"
             style={{
@@ -107,7 +114,7 @@ const Player = () => {
           </div>
         )}
       </div>
-      <div className="fixed bottom-0 left-0 w-full h-16 bg-gray-900 text-white p-4 flex items-center justify-between space-x-2">
+      <div className="fixed bottom-0 left-0 w-full h-16 bg-black text-white p-4 flex items-center justify-between space-x-2">
         <div className="flex items-center space-x-2">
           <img
             className="w-10"
@@ -151,7 +158,14 @@ const Player = () => {
             step="0.01"
             value={volume}
             onChange={handleVolumeChange}
-            className="w-20 h-1 bg-gray-700 rounded-lg appearance-none"
+            className="w-20 h-1 appearance-none rounded-lg"
+            style={{
+              background: `linear-gradient(to right, ${isVolumeHovering ? "#60a5fa" : "white"} 0%, ${isVolumeHovering ? "#60a5fa" : "white"} ${
+                volume * 100
+              }%, #3f3f46 ${volume * 100}%, #3f3f46 100%)`,
+            }}
+            onMouseEnter={() => setIsVolumeHovering(true)}
+            onMouseLeave={() => setIsVolumeHovering(false)}
           />
         </div>
         <audio ref={audioRef} src={currentSong?.songUrl} />

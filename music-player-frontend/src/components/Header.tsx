@@ -9,7 +9,7 @@ const Header = () => {
   const navigate = useNavigate();
 
   return (
-    <header className="w-full bg-gray-900 text-white flex items-center justify-between px-6 py-4 shadow-md">
+    <header className="w-full bg-black text-white flex items-center justify-between px-6 py-4 shadow-md">
       <div className="flex items-center">
         <img src={Icon} alt="Music Player Logo" className="w-8 h-8 cursor-pointer" onClick={() => navigate("/")} />
         <h1 className="ml-2 text-xl font-bold">Music Player</h1>
@@ -18,7 +18,7 @@ const Header = () => {
         <input
           type="text"
           placeholder="Search"
-          className="w-full bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 "
+          className="w-full bg-zinc-900 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 "
         />
       </div>
       <div className="flex items-center">

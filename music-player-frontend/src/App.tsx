@@ -45,7 +45,7 @@ const AppContent: React.FC = () => {
   return isAuthenticated ? (
     <LikedSongsProvider>
       <AudioProvider>
-        <div className="bg-gray-800 h-screen flex flex-col">
+        <div className="bg-zinc-800 h-screen flex flex-col">
           <Header />
           <div className="flex">
             <LeftPanel />

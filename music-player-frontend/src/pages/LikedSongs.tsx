@@ -18,7 +18,7 @@ const LikedSongs = () => {
     <div className="max-w-full h-[80vh] overflow-y-auto mt-8 pb-5">
       <table className="w-full text-left border-collapse">
         <thead>
-          <tr className="text-gray-400 text-sm border-b border-grey-700">
+          <tr className="text-zinc-400 text-sm border-b border-zinc-700">
             <th className="py-2 px-4 w-10">#</th>
             <th className="py-2 px-4">Title</th>
             <th className="py-2 px-4 w-16 text-left"><MdAccessTime size={20}/></th>
@@ -38,7 +38,7 @@ const LikedSongs = () => {
             return (
               <tr
                 key={song.songId}
-                className="hover:bg-gray-900 transition duration-200 border-b border-gray-700"
+                className="hover:bg-zinc-900 transition duration-200 border-b border-gray-700"
               >
                 <td className="py-3 px-4 text-gray-300">{index + 1}</td>
                 <td className="py-3 px-4 flex items-center gap-3">
