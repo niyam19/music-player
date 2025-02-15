@@ -4,6 +4,8 @@ import Profile from "../assets/icons/profile-icon.png";
 
 const Header = () => {
 
+  const userData = localStorage.getItem('userData');
+  const user = userData ? JSON.parse(userData) : null;
   const navigate = useNavigate();
 
   return (
@@ -20,12 +22,12 @@ const Header = () => {
         />
       </div>
       <div className="flex items-center">
-        <span className="mx-2 font-semibold">niyam19</span>
         <img
+          title={user?.username}
           onClick={() => navigate("/profile")}
           src={Profile}
           alt="Profile Logo"
-          className="w-8 h-8 rounded-full"
+          className="w-8 h-8 rounded-full cursor-pointer hover:scale-110 transition-transform duration-300"
         />
       </div>
     </header>

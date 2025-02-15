@@ -9,3 +9,7 @@ body {
   @apply font-inter;
   overflow: hidden;
 }
+
+.custom-toast-container {
+  bottom: 10% !important;
+}

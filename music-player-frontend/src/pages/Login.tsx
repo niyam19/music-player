@@ -25,10 +25,11 @@ const Login = () => {
       const result = await response.json();
       if (response.ok) {
         localStorage.setItem('token', result.token);
+        localStorage.setItem('userData', JSON.stringify(result.user));
         setMessage('Login successful!');
         setTimeout(() => {
             navigate('/',{replace: true})
-            window.location.reload();
+            // window.location.reload();
         }, 500);
       } else {
         setMessage(result.message || 'Login failed.');

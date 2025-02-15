@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import LikedSongsContextType from "../interfaces/LikedSongsType";
 import Song from "../interfaces/Song";
 import { API_URL } from "../constants/apiEnum";
+import { toast } from "react-toastify";
 
 const LikedSongsContext = createContext<LikedSongsContextType | undefined>(
   undefined
@@ -31,10 +32,6 @@ export const LikedSongsProvider: React.FC<{ children: React.ReactNode }> = ({
     console.log("Liked songs", likedSongs);
   }, []);
 
-  const toggleLike = (song: Song) => {
-    toggleLikedSong(song);
-  };
-
   const getLikedSongs = async () => {
     const response = await fetch(`${API_URL}/liked-songs`, {
       method: "GET",
@@ -53,24 +50,34 @@ export const LikedSongsProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const toggleLikedSong = async (song: Song) => {
-    const response = await fetch(`${API_URL}/liked-songs`, {
-      method: likedSongs.some((s) => s.songId === song.songId)
-        ? "DELETE"
-        : "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(song),
-    });   
-    if (!response.ok) {
-      throw new Error("Failed to add song to liked songs");
+    toast.dismiss();
+    const isLiked = likedSongs.some((s) => s.songId === song.songId);
+    try {
+      const response = await fetch(`${API_URL}/liked-songs`, {
+        method: isLiked ? "DELETE" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(song),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to update liked songs");
+      }
+      getLikedSongs();
+      if (isLiked) {
+        toast.success("Song has been removed from your library");
+      } else {
+        toast.success("Song added to your library");
+      }
+    } catch (error) {
+      toast.error("An error occurred while updating liked songs");
     }
-    getLikedSongs();
   };
 
   return (
-    <LikedSongsContext.Provider value={{ likedSongs, toggleLike }}>
+    <LikedSongsContext.Provider value={{ likedSongs, toggleLikedSong }}>
       {children}
     </LikedSongsContext.Provider>
   );

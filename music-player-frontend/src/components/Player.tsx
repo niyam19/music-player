@@ -20,7 +20,7 @@ const Player = () => {
     handleNext,
     currentSong,
   } = useAudioContext();
-  const { toggleLike, likedSongs } = useLikedSongs();
+  const { toggleLikedSong, likedSongs } = useLikedSongs();
   const isLiked = likedSongs?.some(
     (song) => song?.songId === currentSong?.songId
   );
@@ -116,7 +116,7 @@ const Player = () => {
           />
           <span>{currentSong?.songName}</span>
           <button
-            onClick={() => toggleLike(currentSong)}
+            onClick={() => toggleLikedSong(currentSong)}
             className={`rounded-full transition duration-200 text-red-500 ${
               isLiked ? "text-red-500" : "text-white"
             }`}

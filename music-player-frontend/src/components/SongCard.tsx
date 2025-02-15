@@ -12,7 +12,7 @@ const SongCard: React.FC<{
   const [isHovered, setIsHovered] = useState(false);
   // const [isLiked, setIsLiked] = useState(false);
   const {togglePlay, handleSongSelect, currentSong, isPlaying} = useAudioContext();
-  const {toggleLike, likedSongs} = useLikedSongs();
+  const {toggleLikedSong, likedSongs} = useLikedSongs();
   const isLiked = likedSongs.some((song) => song.songId === selectedSong.songId);
 
   const handleMouseEnter = () => {
@@ -66,7 +66,7 @@ const SongCard: React.FC<{
 
         {isHovered && (
           <button
-            onClick={() => toggleLike(selectedSong)}
+            onClick={() => toggleLikedSong(selectedSong)}
             className={`absolute top-2 left-2 p-1 rounded-full transition duration-200 text-red-500 ${
               isLiked ? "text-red-500" : "text-white"
             }`}

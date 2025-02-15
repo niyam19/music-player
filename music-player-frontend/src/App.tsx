@@ -7,6 +7,7 @@ import { BrowserRouter as Router, useNavigate } from "react-router-dom";
 import { AudioProvider } from "./contexts/AudioContext";
 import { LikedSongsProvider } from "./contexts/LikedSongsContext";
 import AuthRoutes from "./routes/authRoutes";
+import { ToastContainer } from "react-toastify";
 
 // Function to check authentication status
 const getAuthStatus = () => {
@@ -24,7 +25,11 @@ const AppContent: React.FC = () => {
       if (!authStatus && window.location.pathname.toLowerCase() !== "/signup") {
         navigate("/login", { replace: true });
       }
-      if(authStatus && (window.location.pathname.toLowerCase() == "/login" || window.location.pathname.toLowerCase() == "/signup")){
+      if (
+        authStatus &&
+        (window.location.pathname.toLowerCase() == "/login" ||
+          window.location.pathname.toLowerCase() == "/signup")
+      ) {
         navigate("/", { replace: true });
       }
     };
@@ -59,9 +64,29 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <Router>
-      <AppContent />
-    </Router>
+    <>
+      <ToastContainer 
+        position="bottom-left"
+        autoClose={2000}
+        hideProgressBar
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        pauseOnHover
+        toastStyle={{
+          backgroundColor: "#333",
+          color: "#fff",
+          fontSize: "16px",
+          fontWeight: "bold",
+          textAlign: "center",
+          padding: "12px 20px",
+        }}
+        className="custom-toast-container"
+      />
+      <Router>
+        <AppContent />
+      </Router>
+    </>
   );
 };
 
