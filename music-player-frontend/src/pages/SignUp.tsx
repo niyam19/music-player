@@ -2,13 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_URL } from "../constants/apiEnum";
 import Icon from "../assets/icons/music-player.png";
+import { toast } from "react-toastify";
 
 const SignUp = () => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState("");
 
   const navigate = useNavigate();
 
@@ -16,7 +16,7 @@ const SignUp = () => {
     e.preventDefault();
 
     if (password != confirmPassword) {
-      setMessage("Passwords do not match.");
+      toast.error("Passwords do not match.");
       return;
     }
 
@@ -36,15 +36,15 @@ const SignUp = () => {
       console.log("response", response);
 
       if (response.ok) {
-        setMessage("SignUp Successful!");
+        toast.success("SignUp Successful!");
         setTimeout(() => {
           navigate("/login");
         }, 500);
       } else {
-        setMessage(result.message || "Signup failed.");
+        toast.error(result.message || "Signup failed.");
       }
     } catch (error) {
-      setMessage("An error occurred. Please try again.");
+      toast.error("An error occurred. Please try again.");
     }
   };
 
@@ -128,9 +128,6 @@ const SignUp = () => {
             Sign Up
           </button>
         </form>
-        {message && (
-          <p className="mt-4 text-center text-sm text-zinc-300">{message}</p>
-        )}
         <div className="mt-4 text-center">
           <p className="text-white">
             Already have an account?{" "}

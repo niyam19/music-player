@@ -2,11 +2,11 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { API_URL } from "../constants/apiEnum";
 import Icon from "../assets/icons/music-player.png";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
 
   const navigate = useNavigate();
 
@@ -28,16 +28,15 @@ const Login = () => {
       if (response.ok) {
         localStorage.setItem("token", result.token);
         localStorage.setItem("userData", JSON.stringify(result.user));
-        setMessage("Login successful!");
+        toast.success("Login successful!");
         setTimeout(() => {
           navigate("/", { replace: true });
-          // window.location.reload();
         }, 500);
       } else {
-        setMessage(result.message || "Login failed.");
+        toast.error(result.message || "Login failed.");
       }
     } catch (error) {
-      setMessage("An error occurred. Please try again.");
+      toast.error("An error occurred. Please try again.");
     }
   };
 
@@ -89,9 +88,6 @@ const Login = () => {
             Login
           </button>
         </form>
-        {message && (
-          <p className="mt-4 text-center text-sm text-zinc-300">{message}</p>
-        )}
         <div className="mt-4 text-center">
           <p className="text-base text-white">
             Don't have an account?{" "}
