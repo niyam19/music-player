@@ -21,7 +21,6 @@ export const LikedSongsProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const token = localStorage.getItem("token");
   if (!token) {
-    alert("User not logged in");
     return;
   }
 
