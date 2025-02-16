@@ -74,20 +74,31 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
   
 
   const handleSongSelect = (song: Song, fromLikedSongs = false) => {
-    fromLikedSongs ? setSongList(likedSongs) : setSongList(songs);
-    const index = songList.findIndex((s: Song) => s?.songId == song?.songId);
-    if (index !== -1) {
-      setCurrentSongIndex((prev: number) => {
-        if (prev == index) {
-          pauseSong();
-        } else {
-          setCurrentSong(song);
-          setIsPlaying(true);
-        }
-        return index;
-      });
+    const newSongList = fromLikedSongs ? likedSongs : songs;
+    
+    // If the song list is changing, reset the index properly
+    if (newSongList !== songList) {
+        setSongList(newSongList);
+        setCurrentSongIndex(-1); // Reset index to avoid old index conflicts
     }
-  };
+
+    const index = newSongList.findIndex((s: Song) => s?.songId === song?.songId);
+
+    if (index !== -1) {
+        setCurrentSongIndex((prevIndex) => {
+            if (prevIndex === index) {
+                // If the same song is clicked, toggle pause/play
+                isPlaying ? pauseSong() : setIsPlaying(true);
+                return prevIndex; // Keep the same index
+            } else {
+                setCurrentSong(song);
+                setIsPlaying(true);
+                return index;
+            }
+        });
+    }
+};
+
 
   const handlePrev = () => {
     setCurrentSongIndex((prev) => {
@@ -136,10 +147,6 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
       audioRef.current.volume = 0.3; // Set max volume
     }
   }, []);
-
-  useEffect(() => {
-    console.log("isPlaying updated:", isPlaying);
-  }, [isPlaying]);
 
   useEffect(() => {
     if (audioRef.current) {
