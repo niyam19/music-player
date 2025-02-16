@@ -70,9 +70,13 @@ const Player = () => {
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseFloat(e.target.value);
+    const maxVolume = 0.3; // Adjust this to set the highest allowed volume
+
+    const scaledVolume = newVolume * maxVolume; // Scale down the volume
     setVolume(newVolume);
+
     if (audioRef.current) {
-      audioRef.current.volume = newVolume;
+      audioRef.current.volume = scaledVolume; // Apply the restricted volume
     }
   };
 
@@ -94,9 +98,7 @@ const Player = () => {
 
   return (
     <>
-      <div
-        className="fixed bottom-[56px] w-full z-10"
-      >
+      <div className="fixed bottom-[56px] w-full z-10">
         <input
           type="range"
           value={progress}
@@ -117,7 +119,10 @@ const Player = () => {
           <div
             className="absolute top-[-20px] bg-black text-white text-xs p-1 rounded"
             style={{
-              left: `${Math.min(Math.max((mouseX / progressBarWidth) * 100, 5), 95)}%`,
+              left: `${Math.min(
+                Math.max((mouseX / progressBarWidth) * 100, 5),
+                95
+              )}%`,
               transform: "translateX(-50%)",
               whiteSpace: "nowrap",
             }}

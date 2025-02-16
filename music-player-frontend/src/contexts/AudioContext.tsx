@@ -132,6 +132,12 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = 0.3; // Set max volume
+    }
+  }, []);
+
+  useEffect(() => {
     console.log("isPlaying updated:", isPlaying);
   }, [isPlaying]);
 
