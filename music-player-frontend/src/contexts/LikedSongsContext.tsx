@@ -40,6 +40,10 @@ export const LikedSongsProvider: React.FC<{ children: React.ReactNode }> = ({
       },
     });
     if (!response.ok) {
+      if (response.status === 404) {
+        setLikedSongs([]);
+        return;
+      }
       throw new Error("Failed to fetch liked songs");
     }
     const data = await response.json();

@@ -111,7 +111,7 @@ const ProfilePage = () => {
         </div>
 
         {/* Email */}
-        <p className="text-zinc-400 text-lg mt-2">{user?.email}</p>
+        <p className="text-gray-400 text-lg mt-2">{user?.email}</p>
 
         <button onClick={handleLogout} className="mt-6 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition duration-300">
           Logout

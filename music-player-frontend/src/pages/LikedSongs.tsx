@@ -3,6 +3,7 @@ import { useAudioContext } from "../contexts/AudioContext";
 import { useLikedSongs } from "../contexts/LikedSongsContext";
 import { FaPlay } from "react-icons/fa";
 import { MdAccessTime } from "react-icons/md";
+import NoSongsFound from "../components/NoSongsFound";
 
 const LikedSongs = () => {
   const { likedSongs } = useLikedSongs();
@@ -14,14 +15,16 @@ const LikedSongs = () => {
     songDurations,
   } = useAudioContext();
 
-  return (
+  return likedSongs.length > 0 ? (
     <div className="max-w-full h-[80vh] overflow-y-auto mt-8 pb-5">
       <table className="w-full text-left border-collapse">
         <thead>
           <tr className="text-zinc-400 text-sm border-b border-zinc-700">
             <th className="py-2 px-4 w-10">#</th>
             <th className="py-2 px-4">Title</th>
-            <th className="py-2 px-4 w-16 text-left"><MdAccessTime size={20}/></th>
+            <th className="py-2 px-4 w-16 text-left">
+              <MdAccessTime size={20} />
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -58,11 +61,11 @@ const LikedSongs = () => {
 
                     <button
                       className={`absolute inset-0 flex items-center justify-center text-white opacity-0 transition duration-300 transform
-                    ${
-                      isSelected
-                        ? "opacity-100 scale-100"
-                        : "opacity-0 scale-100 group-hover:opacity-100 group-hover:scale-125"
-                    }`}
+                  ${
+                    isSelected
+                      ? "opacity-100 scale-100"
+                      : "opacity-0 scale-100 group-hover:opacity-100 group-hover:scale-125"
+                  }`}
                     >
                       {isSelected && isPlaying ? (
                         <FaPause size={20} />
@@ -89,6 +92,8 @@ const LikedSongs = () => {
         </tbody>
       </table>
     </div>
+  ) : (
+    <NoSongsFound />
   );
 };
 
