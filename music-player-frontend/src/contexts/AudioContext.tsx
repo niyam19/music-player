@@ -37,12 +37,12 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchDurations = () => {
     const durations: { [key: string]: number } = {};
-    
+
     songs.forEach((song) => {
       const audio = new Audio(song.songUrl);
       audio.onloadedmetadata = () => {
         durations[song.songId] = audio.duration;
-        if (Object.keys(durations).length === songs.length) {         
+        if (Object.keys(durations).length === songs.length) {
           setSongDurations(durations);
         }
       };
@@ -71,34 +71,35 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
       fetchDurations();
     }
   }, [songs]);
-  
 
-  const handleSongSelect = (song: Song, fromLikedSongs = false) => {
+  const handleSongSelect = (song: Song, fromLikedSongs = false, fromSearch = false) => {
     const newSongList = fromLikedSongs ? likedSongs : songs;
-    
+
     // If the song list is changing, reset the index properly
     if (newSongList !== songList) {
-        setSongList(newSongList);
-        setCurrentSongIndex(-1); // Reset index to avoid old index conflicts
+      setSongList(newSongList);
+      setCurrentSongIndex(-1); // Reset index to avoid old index conflicts
     }
 
-    const index = newSongList.findIndex((s: Song) => s?.songId === song?.songId);
+    const index = newSongList.findIndex(
+      (s: Song) => s?.songId === song?.songId
+    );
 
     if (index !== -1) {
-        setCurrentSongIndex((prevIndex) => {
-            if (prevIndex === index) {
-                // If the same song is clicked, toggle pause/play
-                isPlaying ? pauseSong() : setIsPlaying(true);
-                return prevIndex; // Keep the same index
-            } else {
-                setCurrentSong(song);
-                setIsPlaying(true);
-                return index;
-            }
-        });
+      setCurrentSongIndex((prevIndex) => {
+        if (prevIndex === index) {
+          if(!fromSearch){
+            isPlaying ? pauseSong() : setIsPlaying(true);
+          }
+          return prevIndex; // Keep the same index
+        } else {
+          setCurrentSong(song);
+          setIsPlaying(true);
+          return index;
+        }
+      });
     }
-};
-
+  };
 
   const handlePrev = () => {
     setCurrentSongIndex((prev) => {
