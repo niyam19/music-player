@@ -36,6 +36,7 @@ const SongCard: React.FC<{
       className=" relative max-w-sm w-44 bg-white rounded-lg shadow-md overflow-hidden transition duration-200"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onDoubleClick={handlePlay}
     >
       <div className="relative">
         <img

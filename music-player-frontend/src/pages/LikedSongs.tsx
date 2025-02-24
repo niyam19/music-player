@@ -42,6 +42,7 @@ const LikedSongs = () => {
               <tr
                 key={song.songId}
                 className="hover:bg-zinc-900 transition duration-200 border-b border-gray-700"
+                onDoubleClick={handlePlay}
               >
                 <td className="py-3 px-4 text-gray-300">{index + 1}</td>
                 <td className="py-3 px-4 flex items-center gap-3">
