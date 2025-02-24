@@ -6,6 +6,7 @@ import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
 import likedSongsRoutes from "./routes/likedSongsRoutes"
 import { songs } from "./SongData";
+import { authMiddleware } from "./middleware/authMiddleware";
 
 dotenv.config();
 connectDB();
@@ -18,7 +19,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/liked-songs", likedSongsRoutes)
 
-app.get("/api/songs", (req, res) => {
+app.get("/api/songs", authMiddleware, (req, res) => {
     res.json(songs);
 })
 

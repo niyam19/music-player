@@ -79,7 +79,7 @@ const Header = () => {
                     isPlayingSong ? "text-blue-500" : "text-white"
                   }`}
                   onClick={() => {
-                    handleSongSelect(song, false, true);
+                    handleSongSelect(song, false);
                     setSearchQuery(""); // Clear search on selection
                   }}
                 >

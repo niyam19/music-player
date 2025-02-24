@@ -15,6 +15,6 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
         (req as any).user = verified;
         next();
     } catch(error){
-        res.status(400).json({error: "Invalid Token"});
+        res.status(401).json({error: "Invalid or Expired Token"});
     }
 }

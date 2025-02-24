@@ -3,6 +3,7 @@ import LikedSongsContextType from "../interfaces/LikedSongsType";
 import Song from "../interfaces/Song";
 import { API_URL } from "../constants/apiEnum";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const LikedSongsContext = createContext<LikedSongsContextType | undefined>(
   undefined
@@ -23,7 +24,7 @@ export const LikedSongsProvider: React.FC<{ children: React.ReactNode }> = ({
   if (!token) {
     return;
   }
-
+  const navigate = useNavigate();
   const [likedSongs, setLikedSongs] = useState<Song[]>([]);
 
   useEffect(() => {
@@ -64,10 +65,16 @@ export const LikedSongsProvider: React.FC<{ children: React.ReactNode }> = ({
         },
         body: JSON.stringify(song),
       });
-  
+      if (response.status === 401) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("userData");
+        toast.error('Session expired! Please login again')
+        navigate("/login", { replace: true });
+      }
       if (!response.ok) {
         throw new Error("Failed to update liked songs");
       }
+      
       getLikedSongs();
       if (isLiked) {
         toast.success("Song has been removed from your library");

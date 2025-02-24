@@ -40,7 +40,7 @@ const Player = () => {
   };
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (audioRef.current) {
+    if (audioRef.current?.currentSrc) {
       audioRef.current.currentTime =
         (parseFloat(e.target.value) / 100) * audioRef.current.duration;
     }
@@ -55,7 +55,7 @@ const Player = () => {
   }, [volume]);
 
   const toggleMute = () => {
-    if (audioRef.current) {
+    if (audioRef.current?.currentSrc) {
       if (!isMuted) {
         setPreviousVolume(audioRef.current.volume);
         audioRef.current.volume = 0.0;
@@ -139,32 +139,32 @@ const Player = () => {
             alt={currentSong?.songName}
           />
           <span>{currentSong?.songName}</span>
-          <button
+          {currentSong && <button
             onClick={() => toggleLikedSong(currentSong)}
             className={`rounded-full transition duration-200 text-red-500 ${
               isLiked ? "text-red-500" : "text-white"
             }`}
           >
             <IoHeartSharp size={20} />
-          </button>
+          </button>}
         </div>
         <div className="absolute left-1/2 -translate-x-1/2 flex items-center space-x-2">
-          <button onClick={handlePrev} className="text-4xl">
+          <button onClick={handlePrev} className="text-4xl disabled:opacity-50" disabled={!currentSong}>
             <TbPlayerSkipBackFilled />
           </button>
-          <button onClick={togglePlay} className="text-5xl">
+          <button onClick={togglePlay} className="text-5xl disabled:opacity-50" disabled={!currentSong}>
             {isPlaying ? <TbPlayerPauseFilled /> : <TbPlayerPlayFilled />}
           </button>
-          <button onClick={handleNext} className="text-4xl">
+          <button onClick={handleNext} className="text-4xl disabled:opacity-50" disabled={!currentSong}>
             <TbPlayerSkipForwardFilled />
           </button>
         </div>
 
         <div className="flex items-center space-x-2">
-          <span className="text-white text-base mr-2">
+          {currentSong && <span className="text-white text-base mr-2">
             {formatTime(audioRef.current?.currentTime || 0)} /{" "}
             {formatTime(audioRef.current?.duration || 0)}
-          </span>
+          </span>}
           <span onClick={toggleMute}>
             {!isMuted && volume ? <HiSpeakerWave /> : <HiSpeakerXMark />}
           </span>
