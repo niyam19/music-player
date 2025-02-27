@@ -24,7 +24,6 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
   const navigate = useNavigate();
   const audioRef = useRef<HTMLAudioElement>(null);
   const [songs, setSongs] = useState<Song[]>([]);
-  // const [currentSongIndex, setCurrentSongIndex] = useState(0);
   const [currentSong, setCurrentSong] = useState<any>(null); //NEED TO CHECK TYPE TEMPRORY ADDED ANY
   const [songList, setSongList] = useState<Song[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -86,13 +85,38 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
 
     fetchSongs();
   }, []);
+
+  const fetchCurrentSong = async () => {
+    const userDataFromLocal = localStorage.getItem("userData");
+    const userData = userDataFromLocal ? JSON.parse(userDataFromLocal) : null;
+    if(!userData.userId) return;
+
+    try {
+      const response = await fetch(`${API_URL}/user/current-song/${userData.userId}`);
+      const data = await response.json();
+      
+      if(data.currentSongId){
+        const selectedSong = songs.find((song) => song.songId === data.currentSongId);
+
+      if (selectedSong) { 
+          setCurrentSong(selectedSong);
+      }
+      }
+      
+    } catch (error) {
+      console.error("Error fetching song:", error);
+      
+    }
+  }
+
   useEffect(() => {
     if (songs.length > 0) {
       fetchDurations();
+      fetchCurrentSong();
     }
   }, [songs]);
 
-  const handleSongSelect = (song: Song, fromLikedSongs = false) => {
+  const handleSongSelect = async (song: Song, fromLikedSongs = false) => {
     const newSongList = fromLikedSongs ? likedSongs : songs;
     if (newSongList !== songList) {
       setSongList(newSongList);
@@ -102,6 +126,23 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     setCurrentSong(song);
     setIsPlaying(true);
+    const userDataFromLocal = localStorage.getItem("userData");
+    const userData = userDataFromLocal ? JSON.parse(userDataFromLocal) : null;
+
+    try {
+      await fetch(`${API_URL}/user/update-song`,{
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          userId: userData.userId,
+          songId: song.songId,
+        })
+      })
+    } catch (error) {
+      console.error("Failed to save song state:", error);
+    }
   };
 
   const handlePrev = () => {
@@ -145,14 +186,15 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   useEffect(() => {
+    if (!audioRef.current?.currentSrc) return;
+  
+    audioRef.current.load();
+    audioRef.current.ontimeupdate = handleProgress;
+  
     if (isFirstRender) {
-      setIsFirstRender(false)
-      return; // Skip first render
-    }
-    if (audioRef.current) {
-      audioRef.current.load();
+      setIsFirstRender(false);
+    } else {
       playSong();
-      audioRef.current.ontimeupdate = handleProgress;
     }
   }, [currentSong]);
 

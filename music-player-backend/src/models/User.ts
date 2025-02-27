@@ -5,7 +5,7 @@ interface IUser extends mongoose.Document {
     email: string;
     password: string;
     profilePic?: string;
-    currentSong?: mongoose.Schema.Types.ObjectId;
+    currentSongId?: number;
     currentTime?: number;
 }
 
@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema<IUser>({
     email: { type: String, required: true, unique: true},
     password: { type: String, required: true},
     profilePic: { type: String},
-    currentSong: { type: mongoose.Schema.Types.ObjectId, ref: "Song", default: null },
+    currentSongId: { type: Number, default: null },
     currentTime: { type: Boolean, default: 0},
 })
 
