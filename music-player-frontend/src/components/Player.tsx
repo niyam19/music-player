@@ -41,8 +41,10 @@ const Player = () => {
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (audioRef.current?.currentSrc) {
-      audioRef.current.currentTime =
-        (parseFloat(e.target.value) / 100) * audioRef.current.duration;
+      const newTime = (parseFloat(e.target.value) / 100) * audioRef.current.duration;
+      if (Math.abs(audioRef.current.currentTime - newTime) > 0.1) {
+        audioRef.current.currentTime = newTime;
+      }
     }
   };
 
