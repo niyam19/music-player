@@ -44,11 +44,21 @@ router.post("/update-song", async (req, res) => {
         currentSongId: songId,
         currentTime: currentTime,
       },
-      { new: true }
+      { new: true, select: "currentSongId currentTime" }
     );
-    res.json({ message: "Song state updated", user });
+
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    res.json({
+      message: "Song state updated",
+      currentSongId: user.currentSongId,
+      currentTime: user.currentTime,
+    });
   } catch (error) {
-    res.status(500).json({ error });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
@@ -57,14 +67,17 @@ router.get("/current-song/:userId", async (req, res) => {
   try {
     const user = await User.findById(userId).populate("currentSongId");
 
-    if(!user || !user.currentSongId){
-      res.json({message: "No song found", currentSongId: null});
+    if (!user || !user.currentSongId) {
+      res.json({ message: "No song found", currentSongId: null });
       return;
     }
 
-    res.json({currentSongId: user.currentSongId, currentTime: user.currentTime});
+    res.json({
+      currentSongId: user.currentSongId,
+      currentTime: user.currentTime,
+    });
   } catch (error) {
-    res.status(500).json({ error: error});
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 export default router;
