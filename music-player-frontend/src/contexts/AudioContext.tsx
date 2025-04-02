@@ -30,6 +30,9 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
   const [progress, setProgress] = useState(0);
   const { likedSongs } = useLikedSongs();
   const [isFirstRender, setIsFirstRender] = useState(true);
+  const [isShuffle, setIsShuffle] = useState(
+    localStorage.getItem('isShuffle') === 'true'
+  );
 
   const playSong = () => {
     if (audioRef.current) {
@@ -145,13 +148,43 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  // Helper function to get a random song
+  const getRandomSong = (currentSongList: Song[], currentSongId: number) => {
+    // Filter out the current song
+    const availableSongs = currentSongList.filter(
+      (song) => song.songId !== currentSongId
+    );
+    
+    if (availableSongs.length === 0) return currentSongList[0];
+    
+    // Get a random song from the remaining songs
+    const randomIndex = Math.floor(Math.random() * availableSongs.length);
+    return availableSongs[randomIndex];
+  };
+
   const handlePrev = () => {
+    if (!currentSong) return;
+    
+    if (isShuffle) {
+      const randomSong = getRandomSong(songList, currentSong.songId);
+      setCurrentSong(randomSong);
+      return;
+    }
+    
     const currentIndex = songList.findIndex((s) => s.songId === currentSong?.songId);
     const newIndex = currentIndex > 0 ? currentIndex - 1 : songList.length - 1;
     setCurrentSong(songList[newIndex]);
   };
 
   const handleNext = () => {
+    if (!currentSong) return;
+    
+    if (isShuffle) {
+      const randomSong = getRandomSong(songList, currentSong.songId);
+      setCurrentSong(randomSong);
+      return;
+    }
+    
     const currentIndex = songList.findIndex((s) => s.songId === currentSong?.songId);
     const newIndex = currentIndex < songList.length - 1 ? currentIndex + 1 : 0;
     setCurrentSong(songList[newIndex]);
@@ -198,6 +231,13 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [currentSong]);
 
+  // Toggle shuffle mode
+  const toggleShuffle = () => {
+    const newShuffleState = !isShuffle;
+    setIsShuffle(newShuffleState);
+    localStorage.setItem('isShuffle', newShuffleState.toString());
+  };
+
   return (
     <AudioContext.Provider
       value={{
@@ -210,11 +250,13 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
         playSong,
         pauseSong,
         progress,
+        setProgress,
         handleProgress,
         handleNext,
         handlePrev,
         handleSongSelect,
         songDurations,
+        toggleShuffle,
       }}
     >
       {children}

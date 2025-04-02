@@ -8,6 +8,7 @@ import { AudioProvider } from "./contexts/AudioContext";
 import { LikedSongsProvider } from "./contexts/LikedSongsContext";
 import AuthRoutes from "./routes/authRoutes";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Function to check authentication status
 const getAuthStatus = () => {
@@ -45,11 +46,11 @@ const AppContent: React.FC = () => {
   return isAuthenticated ? (
     <LikedSongsProvider>
       <AudioProvider>
-        <div className="bg-zinc-800 h-screen flex flex-col">
+        <div className="app-container bg-gradient-to-b from-zinc-900 to-black min-h-screen flex flex-col">
           <Header />
-          <div className="flex">
+          <div className="flex flex-1 overflow-hidden">
             <LeftPanel />
-            <div className="flex-1">
+            <div className="flex-1 overflow-hidden">
               <AppRoutes />
             </div>
           </div>
@@ -68,18 +69,23 @@ const App: React.FC = () => {
       <ToastContainer 
         position="bottom-left"
         autoClose={2000}
-        hideProgressBar
+        hideProgressBar={false}
+        newestOnTop
         closeOnClick
         rtl={false}
         pauseOnFocusLoss
+        draggable
         pauseOnHover
+        theme="dark"
         toastStyle={{
-          backgroundColor: "#333",
+          background: "rgba(24, 24, 27, 0.9)",
           color: "#fff",
-          fontSize: "16px",
-          fontWeight: "bold",
-          textAlign: "center",
-          padding: "12px 20px",
+          fontSize: "14px",
+          fontWeight: "500",
+          borderRadius: "8px",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+          backdropFilter: "blur(10px)",
+          border: "1px solid rgba(255, 255, 255, 0.1)"
         }}
         className="custom-toast-container"
       />

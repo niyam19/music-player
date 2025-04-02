@@ -11,10 +11,12 @@ interface AudioContextType {
     pauseSong: () => void;
     handleProgress: () => void;
     progress: number;
+    setProgress: (progress: number) => void;
     handlePrev: () => void;
     handleNext: () => void;
     handleSongSelect: (song: Song, fromLikedSongs?: boolean) => void;
-    songDurations: Record<number, number>
-};
+    songDurations: Record<number, number>;
+    toggleShuffle: () => void;
+}
 
 export default AudioContextType;
