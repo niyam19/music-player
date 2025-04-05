@@ -6,6 +6,7 @@ import AppRoutes from "./routes/appRoutes";
 import { BrowserRouter as Router, useNavigate } from "react-router-dom";
 import { AudioProvider } from "./contexts/AudioContext";
 import { LikedSongsProvider } from "./contexts/LikedSongsContext";
+import { PlaylistProvider } from "./contexts/PlaylistContext";
 import AuthRoutes from "./routes/authRoutes";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -45,18 +46,20 @@ const AppContent: React.FC = () => {
 
   return isAuthenticated ? (
     <LikedSongsProvider>
-      <AudioProvider>
-        <div className="app-container bg-gradient-to-b from-zinc-900 to-black min-h-screen flex flex-col">
-          <Header />
-          <div className="flex flex-1 overflow-hidden">
-            <LeftPanel />
-            <div className="flex-1 overflow-hidden">
-              <AppRoutes />
+      <PlaylistProvider>
+        <AudioProvider>
+          <div className="app-container bg-gradient-to-b from-zinc-900 to-black min-h-screen flex flex-col">
+            <Header />
+            <div className="flex flex-1 overflow-hidden">
+              <LeftPanel />
+              <div className="flex-1 overflow-hidden">
+                <AppRoutes />
+              </div>
             </div>
+            <Player />
           </div>
-          <Player />
-        </div>
-      </AudioProvider>
+        </AudioProvider>
+      </PlaylistProvider>
     </LikedSongsProvider>
   ) : (
     <AuthRoutes />

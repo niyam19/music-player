@@ -11,6 +11,8 @@ import { useAudioContext } from "../contexts/AudioContext";
 import { IoHeartSharp, IoHeartOutline } from "react-icons/io5";
 import { useLikedSongs } from "../contexts/LikedSongsContext";
 import { BiSolidPlaylist } from "react-icons/bi";
+import { usePlaylist } from "../contexts/PlaylistContext";
+import { toast } from "react-toastify";
 
 const Player = () => {
   const {
@@ -25,6 +27,8 @@ const Player = () => {
     toggleShuffle,
   } = useAudioContext();
   const { toggleLikedSong, likedSongs } = useLikedSongs();
+  const { playlists, addSongToPlaylist } = usePlaylist();
+  
   const isLiked = likedSongs?.some(
     (song) => song?.songId === currentSong?.songId
   );
@@ -38,6 +42,7 @@ const Player = () => {
   const progressBarRef = useRef<HTMLDivElement>(null);
   const progressContainerRef = useRef<HTMLDivElement>(null);
   const [progressBarWidth, setProgressBarWidth] = useState(0);
+  const [showPlaylistMenu, setShowPlaylistMenu] = useState(false);
   
   // Initialize shuffle and repeat states
   const [isShuffle, setIsShuffle] = useState(() => {
@@ -60,6 +65,21 @@ const Player = () => {
       window.removeEventListener('resize', updateProgressBarWidth);
     };
   }, []);
+
+  // Close playlist menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (showPlaylistMenu && !target.closest('.playlist-menu-container')) {
+        setShowPlaylistMenu(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showPlaylistMenu]);
 
   // Sync shuffle state with localStorage
   useEffect(() => {
@@ -181,6 +201,14 @@ const Player = () => {
     setIsShuffle(!isShuffle); // Update local UI state
   };
 
+  // Handle adding the current song to a playlist
+  const handleAddToPlaylist = (playlistId: string) => {
+    if (!currentSong) return;
+    
+    addSongToPlaylist(playlistId, currentSong);
+    setShowPlaylistMenu(false);
+  };
+
   return (
     <>
       {currentSong && (
@@ -255,15 +283,53 @@ const Player = () => {
         <div className="flex items-center space-x-4 w-1/4">
           {currentSong ? (
             <>
-              <div className="relative group">
+              <div className="relative group playlist-menu-container">
                 <img
                   className="w-12 h-12 rounded-md object-cover shadow-md"
                   src={currentSong.songImage}
                   alt={currentSong.songName}
                 />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 rounded-md transition-opacity duration-200 flex items-center justify-center">
-                  <BiSolidPlaylist size={20} className="text-white cursor-pointer" />
+                <div 
+                  className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 rounded-md transition-opacity duration-200 flex items-center justify-center cursor-pointer"
+                  onClick={() => setShowPlaylistMenu(!showPlaylistMenu)}
+                >
+                  <BiSolidPlaylist size={20} className="text-white" />
                 </div>
+                
+                {/* Playlist dropdown menu */}
+                {showPlaylistMenu && (
+                  <div className="absolute bottom-full left-0 mb-2 w-64 bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl py-2 z-50 playlist-menu-container">
+                    <div className="px-3 py-2 border-b border-zinc-700">
+                      <h3 className="text-sm font-semibold text-white">Add to playlist</h3>
+                    </div>
+                    <div className="max-h-48 overflow-y-auto custom-scrollbar">
+                      {playlists.length > 0 ? (
+                        playlists.map(playlist => (
+                          <button 
+                            key={playlist.id}
+                            className="w-full text-left px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-700 flex items-center gap-2"
+                            onClick={() => handleAddToPlaylist(playlist.id)}
+                          >
+                            <div className="w-6 h-6 bg-zinc-700 rounded overflow-hidden flex-shrink-0">
+                              {playlist.imageUrl ? (
+                                <img src={playlist.imageUrl} alt={playlist.name} className="w-full h-full object-cover" />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-blue-500 text-white text-xs font-bold">
+                                  {playlist.name.charAt(0)}
+                                </div>
+                              )}
+                            </div>
+                            <span className="truncate">{playlist.name}</span>
+                          </button>
+                        ))
+                      ) : (
+                        <div className="px-4 py-3 text-xs text-zinc-400">
+                          No playlists found. Create a playlist first.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="flex flex-col min-w-0">
                 <div className="font-medium text-sm truncate max-w-[140px] sm:max-w-xs">
