@@ -67,7 +67,6 @@ export const LikedSongsProvider: React.FC<{ children: React.ReactNode }> = ({
       });
       if (response.status === 401) {
         localStorage.removeItem("token");
-        localStorage.removeItem("userData");
         toast.error('Session expired! Please login again')
         navigate("/login", { replace: true });
       }

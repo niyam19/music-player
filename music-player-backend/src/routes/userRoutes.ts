@@ -4,6 +4,26 @@ import User from "../models/User";
 
 const router = express.Router();
 
+router.get("/me", authMiddleware, async (req, res) => {
+  try {
+    const userId = (req as any).user.userId;
+    const user = await User.findById(userId).select("username email");
+
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    res.status(200).json({
+      username: user.username,
+      email: user.email,
+    });
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 router.put("/update-profile", authMiddleware, async (req, res) => {
   try {
     const userId = (req as any).user.userId;

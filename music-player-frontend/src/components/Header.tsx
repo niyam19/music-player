@@ -7,8 +7,6 @@ import { FaPlay } from "react-icons/fa";
 import { GiSoundWaves } from "react-icons/gi";
 
 const Header = () => {
-  const userData = localStorage.getItem("userData");
-  const user = userData ? JSON.parse(userData) : null;
   const navigate = useNavigate();
   const { songs, currentSong, handleSongSelect } = useAudioContext();
   const [searchQuery, setSearchQuery] = useState("");
@@ -110,7 +108,6 @@ const Header = () => {
       {/* Right - Profile */}
       <div className="flex items-center">
         <img
-          title={user?.username}
           onClick={() => navigate("/profile")}
           src={Profile}
           alt="Profile Logo"

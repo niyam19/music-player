@@ -33,12 +33,9 @@ const Login = () => {
       const data = await response.json();
   
       if (response.ok) {
-        // Save the JWT token and user data to localStorage
         localStorage.setItem("token", data.token);
-        localStorage.setItem("userData", JSON.stringify(data.user));
         toast.success("Google login successful!");
-        
-        // Redirect to home or wherever needed
+      
         setTimeout(() => {
           navigate("/", { replace: true });
         }, 500);
@@ -68,7 +65,6 @@ const Login = () => {
       const result = await response.json();
       if (response.ok) {
         localStorage.setItem("token", result.token);
-        localStorage.setItem("userData", JSON.stringify(result.user));
         toast.success("Login successful!");
         setTimeout(() => {
           navigate("/", { replace: true });

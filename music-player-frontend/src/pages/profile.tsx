@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ProfilePlaceholder from "../assets/icons/profile-icon.png";
 import { API_URL } from "../constants/apiEnum";
 import { useNavigate } from "react-router-dom";
@@ -6,25 +6,45 @@ import { toast } from "react-toastify";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-
-  const storedUserData = localStorage.getItem("userData");
-  const user = storedUserData
-    ? JSON.parse(storedUserData)
-    : { username: "Guest", email: "guest@example.com" };
-
-  const [username, setUsername] = useState(user?.username);
+  const token = localStorage.getItem("token");
+  const [username, setUsername] = useState("Guest");
+  const [email, setEmail] = useState("guest@gmail.com");
   const [isEditing, setIsEditing] = useState(false);
   const [profileImage, setProfileImage] = useState(ProfilePlaceholder);
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch(`${API_URL}/user/me`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if(response.ok){
+          const result = await response.json();
+          setUsername(result.username);
+          setEmail(result.email);
+        }
+      } catch (error) {
+        
+      }
+    };
+    fetchProfile();
+  }, []);
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
   };
 
   const saveUsername = async () => {
+    if (!username.trim()) {
+      toast.error("Username cannot be empty");
+      setUsername("Guest");
+      return;
+    }
     setIsEditing(false);
-    const updatedUserData = { ...user, username };
     try {
-      const token = localStorage.getItem("token");
       const response = await fetch(`${API_URL}/user/update-profile`, {
         method: "PUT",
         headers: {
@@ -36,7 +56,6 @@ const ProfilePage = () => {
 
       if (response.ok) {
         console.log("Profile updated successfully");
-        localStorage.setItem("userData", JSON.stringify(updatedUserData));
       } else {
         console.error("Failed to update profile:", await response.json());
       }
@@ -60,10 +79,9 @@ const ProfilePage = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("userData");
     navigate("/login");
     toast.success("Logout successful!");
-  }
+  };
 
   return (
     <div className="flex justify-center items-center h-[80vh] bg-zinc-800 text-white">
@@ -111,9 +129,12 @@ const ProfilePage = () => {
         </div>
 
         {/* Email */}
-        <p className="text-gray-400 text-lg mt-2">{user?.email}</p>
+        <p className="text-gray-400 text-lg mt-2">{email}</p>
 
-        <button onClick={handleLogout} className="mt-6 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition duration-300">
+        <button
+          onClick={handleLogout}
+          className="mt-6 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition duration-300"
+        >
           Logout
         </button>
       </div>
