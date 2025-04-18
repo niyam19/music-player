@@ -11,6 +11,12 @@ import { useLikedSongs } from "./LikedSongsContext";
 import { API_URL } from "../constants/apiEnum";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { jwtDecode } from "jwt-decode";
+interface CustomJwtPayload {
+  exp: number;
+  iat: number;
+  userId: string;  // Add userId as part of the payload
+}
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
 
@@ -87,12 +93,9 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const fetchCurrentSong = async () => {
-    const userDataFromLocal = localStorage.getItem("userData");
-    const userData = userDataFromLocal ? JSON.parse(userDataFromLocal) : null;
-    if(!userData.userId) return;
-
+    const decoded = token ? jwtDecode<CustomJwtPayload>(token) : null;
     try {
-      const response = await fetch(`${API_URL}/user/current-song/${userData.userId}`);
+      const response = await fetch(`${API_URL}/user/current-song/${decoded?.userId}`);
       const data = await response.json();
       
       if(data.currentSongId){
@@ -111,7 +114,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     if (songs.length > 0) {
-      fetchDurations();
+      // fetchDurations();
       fetchCurrentSong();
     }
   }, [songs]);

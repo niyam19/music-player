@@ -11,7 +11,7 @@ import { ToastContainer } from "react-toastify";
 
 // Function to check authentication status
 const getAuthStatus = () => {
-  return localStorage.getItem("token") !== null;
+  return localStorage.getItem("token") !== null && localStorage.getItem("userData") !== null;
 };
 
 const AppContent: React.FC = () => {
