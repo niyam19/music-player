@@ -12,7 +12,7 @@ interface IUser extends mongoose.Document {
 const userSchema = new mongoose.Schema<IUser>({
     username: { type: String, required: true},
     email: { type: String, required: true, unique: true},
-    password: { type: String, required: true},
+    password: { type: String},
     profilePic: { type: String},
     currentSongId: { type: Number, default: null },
     currentTime: { type: Boolean, default: 0},

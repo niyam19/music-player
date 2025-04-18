@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import User from "../models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import admin from "../firebaseAdmin";
 
 export const signUp = async (req: Request, res: Response) => {
   try {
@@ -57,3 +58,47 @@ export const login = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+export const loginGoogle = async (req: Request, res: Response) => {
+  const { idToken } = req.body;
+
+  try {
+    // Verify the Firebase ID token
+    const decodedToken = await admin.auth().verifyIdToken(idToken);  
+    const { name, email } = decodedToken;
+
+    // Check if user already exists in MongoDB
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // If not, create new user
+      user = new User({
+        username: name,
+        email,
+        createdAt: new Date()
+      });
+
+      await user.save();
+    }
+
+    // Create JWT token for the user
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET as string,
+      { expiresIn: "1d" }
+    );
+    // Return the user and token
+    res.status(200).json({
+      message: "Google Login successful",
+      token,
+      user: {
+        userId: user._id,
+        username: user.username,
+        email: user.email,
+      }
+    });
+  } catch (error) {
+    console.error('Google login error:', error);
+    res.status(401).json({ message: 'Invalid ID token' });
+  }
+}

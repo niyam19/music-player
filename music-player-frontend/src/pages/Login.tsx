@@ -3,12 +3,53 @@ import { Link, useNavigate } from "react-router-dom";
 import { API_URL } from "../constants/apiEnum";
 import Icon from "../assets/icons/music-player.png";
 import { toast } from "react-toastify";
+import { signInWithPopup } from "firebase/auth";
+import { auth, provider } from "../../firebase";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
+
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      console.log("User info:", user);
+  
+      // Get the Firebase ID token
+      const idToken = await user.getIdToken();
+  
+      // Send this token to your backend for verification and login
+      const response = await fetch(`${API_URL}/auth/login-google`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ idToken }), // Send ID token to backend
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        // Save the JWT token and user data to localStorage
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("userData", JSON.stringify(data.user));
+        toast.success("Google login successful!");
+        
+        // Redirect to home or wherever needed
+        setTimeout(() => {
+          navigate("/", { replace: true });
+        }, 500);
+      } else {
+        toast.error(data.message || "Google login failed.");
+      }
+    } catch (error) {
+      console.error("Google Sign-In Error", error);
+      toast.error("An error occurred with Google login.");
+    }
+  };
 
   const handleLogin = async (e: any) => {
     e.preventDefault();
@@ -47,7 +88,9 @@ const Login = () => {
         <h1 className="text-3xl font-bold text-white">Music Player</h1>
       </div>
       <div className="w-full max-w-md p-8 bg-zinc-900 shadow-lg rounded-lg">
-        <h2 className="text-2xl font-bold mb-6 text-white text-center">Login</h2>
+        <h2 className="text-2xl font-bold mb-6 text-white text-center">
+          Login
+        </h2>
         <form onSubmit={handleLogin}>
           <div className="mb-4">
             <label
@@ -91,10 +134,34 @@ const Login = () => {
         <div className="mt-4 text-center">
           <p className="text-base text-white">
             Don't have an account?{" "}
-            <Link to="/signup" replace className="text-blue-500">
+            <Link
+              to="/signup"
+              replace
+              className="text-blue-500 hover:underline"
+            >
               Sign Up
             </Link>
           </p>
+        </div>
+
+        <div className="my-6 flex items-center gap-4">
+          <div className="flex-grow h-px bg-zinc-700" />
+          <span className="text-zinc-400 text-sm">or</span>
+          <div className="flex-grow h-px bg-zinc-700" />
+        </div>
+
+        <div>
+          <button
+            onClick={handleGoogleLogin}
+            className="w-full flex items-center justify-center gap-3 border border-zinc-600 rounded-md py-2 hover:bg-zinc-800 transition-colors duration-300"
+          >
+            <img
+              src="https://www.svgrepo.com/show/475656/google-color.svg"
+              alt="Google logo"
+              className="w-5 h-5"
+            />
+            <span className="text-white font-medium">Continue with Google</span>
+          </button>
         </div>
       </div>
     </div>
