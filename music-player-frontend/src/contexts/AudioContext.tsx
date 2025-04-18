@@ -114,7 +114,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     if (songs.length > 0) {
-      // fetchDurations();
+      fetchDurations();
       fetchCurrentSong();
     }
   }, [songs]);
