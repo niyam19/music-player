@@ -12,6 +12,7 @@ import { API_URL } from "../constants/apiEnum";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
+import { GLOBAL_ENUM } from "../constants/globalEnum";
 interface CustomJwtPayload {
   exp: number;
   iat: number;
@@ -129,9 +130,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     setCurrentSong(song);
     setIsPlaying(true);
-    const userDataFromLocal = localStorage.getItem("userData");
-    const userData = userDataFromLocal ? JSON.parse(userDataFromLocal) : null;
-
+    const decoded = token ? jwtDecode<CustomJwtPayload>(token) : null;
     try {
       await fetch(`${API_URL}/user/update-song`,{
         method: "POST",
@@ -139,7 +138,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          userId: userData.userId,
+          userId: decoded?.userId,
           songId: song.songId,
         })
       })
@@ -184,7 +183,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.volume = 0.3; // Set max volume
+      audioRef.current.volume = GLOBAL_ENUM.MAX_VOLUME;
     }
   }, []);
 

@@ -9,6 +9,7 @@ import { HiSpeakerWave, HiSpeakerXMark } from "react-icons/hi2";
 import { useAudioContext } from "../contexts/AudioContext";
 import { IoHeartSharp } from "react-icons/io5";
 import { useLikedSongs } from "../contexts/LikedSongsContext";
+import { GLOBAL_ENUM } from "../constants/globalEnum";
 
 const Player = () => {
   const {
@@ -63,8 +64,8 @@ const Player = () => {
         audioRef.current.volume = 0.0;
         setVolume(0.0);
       } else {
-        audioRef.current.volume = previousVolume;
-        setVolume(previousVolume);
+        audioRef.current.volume = previousVolume;       
+        setVolume(previousVolume/GLOBAL_ENUM.MAX_VOLUME);
       }
       setIsMuted(!isMuted);
     }
@@ -72,11 +73,8 @@ const Player = () => {
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseFloat(e.target.value);
-    const maxVolume = 0.3; // Adjust this to set the highest allowed volume
-
-    const scaledVolume = newVolume * maxVolume; // Scale down the volume
-    setVolume(newVolume);
-
+    const scaledVolume = newVolume * GLOBAL_ENUM.MAX_VOLUME; // Scale down the volume
+    setVolume(newVolume); 
     if (audioRef.current) {
       audioRef.current.volume = scaledVolume; // Apply the restricted volume
     }
