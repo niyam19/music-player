@@ -26,10 +26,10 @@ export const LikedSongsProvider: React.FC<{ children: React.ReactNode }> = ({
   }
   const navigate = useNavigate();
   const [likedSongs, setLikedSongs] = useState<Song[]>([]);
+  const [likedSongsSet, setLikedSongsSet] = useState(new Set<number>());
 
   useEffect(() => {
     getLikedSongs();
-    console.log("Liked songs", likedSongs);
   }, []);
 
   const getLikedSongs = async () => {
@@ -49,16 +49,17 @@ export const LikedSongsProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     const data = await response.json();
       console.log("Fetched liked songs:", data);
-
+      const likedSet = new Set<number>(data.map((song: { songId: number }) => song.songId));
       setLikedSongs(data);
+      setLikedSongsSet(likedSet);
   };
 
   const toggleLikedSong = async (song: Song) => {
     toast.dismiss();
-    const isLiked = likedSongs.some((s) => s.songId === song.songId);
+    const updatedSet = new Set(likedSongsSet);
     try {
       const response = await fetch(`${API_URL}/liked-songs`, {
-        method: isLiked ? "DELETE" : "POST",
+        method: updatedSet.has(song.songId) ? "DELETE" : "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -73,20 +74,24 @@ export const LikedSongsProvider: React.FC<{ children: React.ReactNode }> = ({
       if (!response.ok) {
         throw new Error("Failed to update liked songs");
       }
-      
-      getLikedSongs();
-      if (isLiked) {
+      if (updatedSet.has(song.songId)) {
+        updatedSet.delete(song.songId);
+        const index = likedSongs.findIndex(s => s.songId === song.songId);
+        if (index > -1) likedSongs.splice(index, 1);
         toast.success("Song has been removed from your library");
       } else {
+        updatedSet.add(song.songId);
+        likedSongs.push(song);
         toast.success("Song added to your library");
       }
+      setLikedSongsSet(updatedSet);
     } catch (error) {
       toast.error("An error occurred while updating liked songs");
     }
   };
 
   return (
-    <LikedSongsContext.Provider value={{ likedSongs, toggleLikedSong }}>
+    <LikedSongsContext.Provider value={{ likedSongs, toggleLikedSong, likedSongsSet }}>
       {children}
     </LikedSongsContext.Provider>
   );

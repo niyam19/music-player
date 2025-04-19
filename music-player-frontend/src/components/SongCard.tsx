@@ -10,10 +10,9 @@ const SongCard: React.FC<{
   selectedSong: Song;
 }> = ({ selectedSong }) => {
   const [isHovered, setIsHovered] = useState(false);
-  // const [isLiked, setIsLiked] = useState(false);
   const {togglePlay, handleSongSelect, currentSong, isPlaying} = useAudioContext();
-  const {toggleLikedSong, likedSongs} = useLikedSongs();
-  const isLiked = likedSongs.some((song) => song.songId === selectedSong.songId);
+  const {toggleLikedSong, likedSongsSet} = useLikedSongs();
+  const isLiked = likedSongsSet.has(selectedSong.songId);
 
   const handleMouseEnter = () => {
     setIsHovered(true);
